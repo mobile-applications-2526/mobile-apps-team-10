@@ -1,24 +1,44 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+    // app/_layout.tsx
+    import { Tabs } from 'expo-router';
+    import { Ionicons } from '@expo/vector-icons';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+    export default function RootLayout() {
+      return (
+        <Tabs
+          screenOptions={{
+            headerShown: false,
+            tabBarActiveTintColor: 'tomato',
+            tabBarInactiveTintColor: 'gray',
+          }}
+        >
+          <Tabs.Screen
+            name="(tabs)/index"
+            options={{
+              title: 'Home',
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="home" size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="(tabs)/recipes"
+            options={{
+              title: 'Recipes',
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="restaurant" size={size} color={color} />
+              ),
+            }}
+          />
 
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
-
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
-}
+          <Tabs.Screen
+                  name="(tabs)/signup"
+                  options={{
+                    title: 'Account',
+                    tabBarIcon: ({ color, size }) => (
+                      <Ionicons name="person" size={size} color={color} />
+                    ),
+                  }}
+                />
+        </Tabs>
+      );
+    }

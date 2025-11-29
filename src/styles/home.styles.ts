@@ -1,23 +1,25 @@
 import { StyleSheet } from 'react-native'
+import theme from '@/src/styles/theme'
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
-    backgroundColor: '#fff',
+    padding: theme.spacing.lg,
+    backgroundColor: theme.colors.background,
   },
   title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 20,
+    fontSize: theme.fontSizes.lg,
+    fontWeight: theme.fontWeights.bold,
+    marginBottom: theme.spacing.lg,
     textAlign: "center",
+    color: theme.colors.text,
   },
   image: {
     width: 200,
     height: 200,
-    borderRadius: 12,
+    borderRadius: theme.radii.lg,
   },
 });
 

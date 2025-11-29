@@ -1,7 +1,7 @@
-import { supabase } from '@/src/supabase/supabase';
 import { styles } from '@/src/styles/signup.styles';
 import { useState } from 'react';
 import { Button, Text, TextInput, View } from 'react-native';
+import SignupService from '@/src/services/signup.service';
 
 export default function SignUpScreen() {
   const [email, setEmail] = useState('');
@@ -9,15 +9,11 @@ export default function SignUpScreen() {
   const [result, setResult] = useState<string | null>(null);
 
   const signUp = async () => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-
-    if (error) {
-      setResult(error.message);
+    const res = await SignupService.signUp(email, password);
+    if (res.error) {
+      setResult(res.error.message ?? String(res.error));
     } else {
-      setResult('Check your email for confirmation.');
+      setResult(res.message ?? 'Check your email for confirmation.');
     }
   };
 

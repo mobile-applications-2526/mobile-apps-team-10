@@ -24,13 +24,37 @@ export default function FetchRecipes() {
   const [loading, setLoading] = useState(true);
   const [expandedIds, setExpandedIds] = useState<number[]>([]);
   const [filterText, setFilterText] = useState('');
-  const [selectedIngredients, setSelectedIngredients] = useState([]);
+  const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
+  const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([]);
 
   const handleAddIngredient = () => {
-    if (filterText.trim().length === 0) return;
-    setSelectedIngredients([...selectedIngredients, filterText.trim()]);
+    const ing = filterText.trim().toLowerCase();
+    if (!ing || selectedIngredients.includes(ing)) return;
+    setSelectedIngredients([...selectedIngredients, ing]);
     setFilterText('');
   };
+
+  const handleRemoveIngredient = (ing: string) => {
+    setSelectedIngredients(selectedIngredients.filter(i => i !== ing));
+  };
+
+  // Whenever selectedIngredients changes, filter recipes automatically
+  useEffect(() => {
+    if (selectedIngredients.length === 0) {
+      setFilteredRecipes(recipes);
+      return;
+    }
+
+    const filtered = recipes.filter(recipe =>
+      selectedIngredients.every(ing =>
+        recipe.recipe_ingredients.some(ri =>
+          ri.ingredients.name.toLowerCase().includes(ing)
+        )
+      )
+    );
+
+    setFilteredRecipes(filtered);
+  }, [selectedIngredients, recipes]);
 
   useEffect(() => {
     const load = async () => {
@@ -53,6 +77,7 @@ export default function FetchRecipes() {
         console.log(error);
       } else {
         setRecipes(data as Recipe[]);
+        setFilteredRecipes(data as Recipe[]);
       }
       setLoading(false);
     };
@@ -61,8 +86,8 @@ export default function FetchRecipes() {
   }, []);
 
   const toggleExpand = (id: number) => {
-    setExpandedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    setExpandedIds(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
     );
   };
 
@@ -70,11 +95,11 @@ export default function FetchRecipes() {
 
   return (
     <View style={styles.screen}>
-      {/* Fixed Header */}
       <View style={styles.header}>
         <Text style={styles.pageTitle}>Recipes</Text>
       </View>
 
+      {/* Filter Section */}
       <View style={styles.filterSection}>
         <TextInput
           style={styles.input}
@@ -85,12 +110,23 @@ export default function FetchRecipes() {
         <TouchableOpacity style={styles.addButton} onPress={handleAddIngredient}>
           <Text style={styles.addButtonText}>Add</Text>
         </TouchableOpacity>
-
       </View>
 
-      {/* Scrollable Content */}
+      {/* Selected Ingredients */}
+      <View style={styles.selectedList}>
+        {selectedIngredients.map(ing => (
+          <View key={ing} style={styles.selectedItem}>
+            <Text>{ing}</Text>
+            <TouchableOpacity onPress={() => handleRemoveIngredient(ing)}>
+              <Text style={styles.remove}>X</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+      </View>
+
+      {/* Recipe List */}
       <ScrollView contentContainerStyle={styles.container}>
-        {recipes.map((recipe) => {
+        {filteredRecipes.map(recipe => {
           const isExpanded = expandedIds.includes(recipe.id);
           return (
             <TouchableOpacity
@@ -104,7 +140,7 @@ export default function FetchRecipes() {
               {isExpanded && (
                 <>
                   <Text style={styles.subheading}>Ingredients:</Text>
-                  {recipe.recipe_ingredients.map((ri) => (
+                  {recipe.recipe_ingredients.map(ri => (
                     <Text key={ri.ingredient_id} style={styles.ingredient}>
                       {ri.quantity} {ri.unit} {ri.ingredients.name}
                     </Text>
@@ -125,6 +161,7 @@ export default function FetchRecipes() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   screen: {
@@ -213,5 +250,37 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
+  },
+  selectedList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 15,
+    marginBottom: 10,
+  },
+  selectedItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#eee',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 20,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  remove: {
+    marginLeft: 6,
+    color: 'red',
+    fontWeight: '700',
+  },
+  filterButton: {
+    backgroundColor: '#2196f3',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginLeft: 5,
+  },
+  filterButtonText: {
+    color: '#fff',
+    fontWeight: '700',
   },
 });

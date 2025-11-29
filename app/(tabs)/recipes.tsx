@@ -1,6 +1,8 @@
 import { supabase } from '@/src/supabase/supabase';
 import { useEffect, useState } from 'react';
 import { Text, View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { TextInput, Button } from 'react-native';
+
 
 type Ingredient = {
   ingredient_id: number;
@@ -21,6 +23,14 @@ export default function FetchRecipes() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedIds, setExpandedIds] = useState<number[]>([]);
+  const [filterText, setFilterText] = useState('');
+  const [selectedIngredients, setSelectedIngredients] = useState([]);
+
+  const handleAddIngredient = () => {
+    if (filterText.trim().length === 0) return;
+    setSelectedIngredients([...selectedIngredients, filterText.trim()]);
+    setFilterText('');
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -63,6 +73,19 @@ export default function FetchRecipes() {
       {/* Fixed Header */}
       <View style={styles.header}>
         <Text style={styles.pageTitle}>Recipes</Text>
+      </View>
+
+      <View style={styles.filterSection}>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter ingredient..."
+          value={filterText}
+          onChangeText={setFilterText}
+        />
+        <TouchableOpacity style={styles.addButton} onPress={handleAddIngredient}>
+          <Text style={styles.addButtonText}>Add</Text>
+        </TouchableOpacity>
+
       </View>
 
       {/* Scrollable Content */}
@@ -162,5 +185,33 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     fontSize: 16,
     marginBottom: 3,
+  },
+  filterSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    marginBottom: 10,
+  },
+  input: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginRight: 10,
+  },
+  addButton: {
+    backgroundColor: 'tomato',
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

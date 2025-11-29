@@ -1,4 +1,5 @@
-import { Text, View, Image, StyleSheet } from "react-native";
+import { Text, View, Image } from 'react-native';
+import { styles } from '@/src/styles/home.styles';
 
 export default function Index() {
   return (
@@ -14,23 +15,3 @@ export default function Index() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  image: {
-    width: 200,
-    height: 200,
-    borderRadius: 12,
-  },
-});

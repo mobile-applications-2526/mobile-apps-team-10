@@ -5,29 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="acd62cc9-0072-4797-ac3c-39963de82ac3" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/(tabs)/recipes.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/assets/logo.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/_layout.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/explore.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/signup.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/signup.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/test.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/_layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/_layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/modal.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/external-link.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/haptic-tab.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/hello-wave.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/parallax-scroll-view.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/themed-text.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/themed-view.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/collapsible.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/icon-symbol.ios.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/icon-symbol.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/constants/theme.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/hooks/use-color-scheme.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/hooks/use-color-scheme.web.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/hooks/use-theme-color.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/reset-project.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/recipes.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/recipes.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,7 +36,7 @@
     &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
     &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;display-recipes&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;filter-recipes&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;configurable.group.appearance&quot;
   }
 }</component>
@@ -78,5 +56,8 @@
       <updated>1763645122019</updated>
     </task>
     <servers />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.ts" />
   </component>
 </project>

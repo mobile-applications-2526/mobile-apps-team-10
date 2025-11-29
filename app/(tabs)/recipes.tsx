@@ -1,58 +1,57 @@
-import { supabase } from '@/src/supabase/supabase';
+import RecipesService, { Recipe } from '@/src/services/recipes.service';
+import { styles } from '@/src/styles/recipes.styles';
 import { useEffect, useState } from 'react';
-import { Text, View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-type Ingredient = {
-  ingredient_id: number;
-  quantity: number;
-  unit: string;
-  ingredients: { name: string };
-};
-
-type Recipe = {
-  id: number;
-  title: string;
-  description: string;
-  steps: string[];
-  recipe_ingredients: Ingredient[];
-};
 
 export default function FetchRecipes() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedIds, setExpandedIds] = useState<number[]>([]);
+  const [filterText, setFilterText] = useState('');
+  const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
+  const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([]);
+
+  const handleAddIngredient = () => {
+    const ing = filterText.trim().toLowerCase();
+    if (!ing || selectedIngredients.includes(ing)) return;
+    setSelectedIngredients([...selectedIngredients, ing]);
+    setFilterText('');
+  };
+
+  const handleRemoveIngredient = (ing: string) => {
+    setSelectedIngredients(selectedIngredients.filter(i => i !== ing));
+  };
 
   useEffect(() => {
-    const load = async () => {
-      const { data, error } = await supabase
-        .from('recipes')
-        .select(`
-          id,
-          title,
-          description,
-          steps,
-          recipe_ingredients (
-            quantity,
-            unit,
-            ingredient_id,
-            ingredients (name)
-          )
-        `);
+    const filtered = RecipesService.filterByIngredients(recipes, selectedIngredients);
+    setFilteredRecipes(filtered);
+  }, [selectedIngredients, recipes]);
 
-      if (error) {
-        console.log(error);
-      } else {
-        setRecipes(data as Recipe[]);
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      try {
+        const data = await RecipesService.fetchAll();
+        if (!mounted) return;
+        setRecipes(data);
+        setFilteredRecipes(data);
+      } catch (err) {
+        console.log('Failed to load recipes', err);
+      } finally {
+        if (mounted) setLoading(false);
       }
-      setLoading(false);
     };
 
-    load();
+    void load();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const toggleExpand = (id: number) => {
-    setExpandedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    setExpandedIds(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
     );
   };
 
@@ -60,14 +59,37 @@ export default function FetchRecipes() {
 
   return (
     <View style={styles.screen}>
-      {/* Fixed Header */}
       <View style={styles.header}>
         <Text style={styles.pageTitle}>Recipes</Text>
       </View>
 
-      {/* Scrollable Content */}
+      {/* Filter adhv ingrediënten */}
+      <View style={styles.filterSection}>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter ingredient..."
+          value={filterText}
+          onChangeText={setFilterText}
+        />
+        <TouchableOpacity style={styles.addButton} onPress={handleAddIngredient}>
+          <Text style={styles.addButtonText}>Add</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.selectedList}>
+        {selectedIngredients.map(ing => (
+          <View key={ing} style={styles.selectedItem}>
+            <Text>{ing}</Text>
+            <TouchableOpacity onPress={() => handleRemoveIngredient(ing)}>
+              <Text style={styles.remove}>X</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+      </View>
+
+      {/* Toon recepten */}
       <ScrollView contentContainerStyle={styles.container}>
-        {recipes.map((recipe) => {
+        {filteredRecipes.map(recipe => {
           const isExpanded = expandedIds.includes(recipe.id);
           return (
             <TouchableOpacity
@@ -81,7 +103,7 @@ export default function FetchRecipes() {
               {isExpanded && (
                 <>
                   <Text style={styles.subheading}>Ingredients:</Text>
-                  {recipe.recipe_ingredients.map((ri) => (
+                  {recipe.recipe_ingredients.map(ri => (
                     <Text key={ri.ingredient_id} style={styles.ingredient}>
                       {ri.quantity} {ri.unit} {ri.ingredients.name}
                     </Text>
@@ -102,65 +124,3 @@ export default function FetchRecipes() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    paddingTop: 35, // extra top padding
-    backgroundColor: '#fff',
-  },
-  header: {
-    paddingVertical: 10,
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    zIndex: 10,
-  },
-  pageTitle: {
-    fontSize: 30,
-    fontWeight: '800',
-  },
-  container: {
-    padding: 15,
-    alignItems: 'center',
-    paddingTop: 10,
-  },
-  loading: {
-    marginTop: 50,
-    fontSize: 20,
-    textAlign: 'center',
-  },
-  recipeCard: {
-    width: '90%',
-    marginBottom: 15,
-    padding: 15,
-    borderRadius: 12,
-    backgroundColor: '#f7f7f7',
-    borderWidth: 1,
-    borderColor: '#ccc',
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    marginBottom: 3,
-  },
-  description: {
-    fontSize: 16,
-    fontStyle: 'italic',
-    marginBottom: 8,
-  },
-  subheading: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginTop: 10,
-    marginBottom: 4,
-  },
-  ingredient: {
-    marginLeft: 12,
-    fontSize: 16,
-  },
-  step: {
-    marginLeft: 12,
-    fontSize: 16,
-    marginBottom: 3,
-  },
-});

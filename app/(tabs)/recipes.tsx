@@ -1,23 +1,8 @@
+import RecipesService, { Recipe } from '@/src/services/recipes.service';
 import { styles } from '@/src/styles/recipes.styles';
-import { supabase } from '@/src/supabase/supabase';
 import { useEffect, useState } from 'react';
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-
-type Ingredient = {
-  ingredient_id: number;
-  quantity: number;
-  unit: string;
-  ingredients: { name: string };
-};
-
-type Recipe = {
-  id: number;
-  title: string;
-  description: string;
-  steps: string[];
-  recipe_ingredients: Ingredient[];
-};
 
 export default function FetchRecipes() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -39,49 +24,29 @@ export default function FetchRecipes() {
   };
 
   useEffect(() => {
-    if (selectedIngredients.length === 0) {
-      setFilteredRecipes(recipes);
-      return;
-    }
-
-    const filtered = recipes.filter(recipe =>
-      selectedIngredients.every(ing =>
-        recipe.recipe_ingredients.some(ri =>
-          ri.ingredients.name.toLowerCase().includes(ing)
-        )
-      )
-    );
-
+    const filtered = RecipesService.filterByIngredients(recipes, selectedIngredients);
     setFilteredRecipes(filtered);
   }, [selectedIngredients, recipes]);
 
   useEffect(() => {
+    let mounted = true;
     const load = async () => {
-      const { data, error } = await supabase
-        .from('recipes')
-        .select(`
-          id,
-          title,
-          description,
-          steps,
-          recipe_ingredients (
-            quantity,
-            unit,
-            ingredient_id,
-            ingredients (name)
-          )
-        `);
-
-      if (error) {
-        console.log(error);
-      } else {
-        setRecipes(data as Recipe[]);
-        setFilteredRecipes(data as Recipe[]);
+      try {
+        const data = await RecipesService.fetchAll();
+        if (!mounted) return;
+        setRecipes(data);
+        setFilteredRecipes(data);
+      } catch (err) {
+        console.log('Failed to load recipes', err);
+      } finally {
+        if (mounted) setLoading(false);
       }
-      setLoading(false);
     };
 
-    load();
+    void load();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const toggleExpand = (id: number) => {

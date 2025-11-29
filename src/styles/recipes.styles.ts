@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    paddingTop: 35, // extra top padding
+    paddingTop: 35,
     backgroundColor: "#fff",
   },
   header: {

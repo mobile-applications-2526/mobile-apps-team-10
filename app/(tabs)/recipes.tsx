@@ -1,7 +1,7 @@
+import { styles } from '@/src/styles/recipes.styles';
 import { supabase } from '@/src/supabase/supabase';
 import { useEffect, useState } from 'react';
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { styles } from './recipes.styles';
 
 
 type Ingredient = {
@@ -98,6 +98,7 @@ export default function FetchRecipes() {
         <Text style={styles.pageTitle}>Recipes</Text>
       </View>
 
+      {/* Filter adhv ingrediënten */}
       <View style={styles.filterSection}>
         <TextInput
           style={styles.input}
@@ -121,6 +122,7 @@ export default function FetchRecipes() {
         ))}
       </View>
 
+      {/* Toon recepten */}
       <ScrollView contentContainerStyle={styles.container}>
         {filteredRecipes.map(recipe => {
           const isExpanded = expandedIds.includes(recipe.id);

@@ -2,6 +2,19 @@ import theme from "@/src/styles/theme";
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
+  button: {
+    backgroundColor: theme.colors.accent,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: theme.radii.md,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  buttonText: {
+    color: theme.colors.white,
+    fontSize: theme.fontSizes.sm,
+    fontWeight: theme.fontWeights.semibold,
+  },
   container: {
     flex: 1,
     paddingTop: 60,

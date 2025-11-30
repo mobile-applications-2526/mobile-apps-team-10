@@ -1,12 +1,14 @@
-import { styles } from '@/src/styles/signup.styles';
-import { useState } from 'react';
-import { Button, Text, TextInput, View } from 'react-native';
 import SignupService from '@/src/services/signup.service';
+import { styles } from '@/src/styles/account.styles';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { Pressable, Text, TextInput, View } from 'react-native';
 
 export default function SignUpScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [result, setResult] = useState<string | null>(null);
+  const router = useRouter();
 
   const signUp = async () => {
     const res = await SignupService.signUp(email, password);
@@ -37,9 +39,14 @@ export default function SignUpScreen() {
         style={styles.input}
       />
 
-      <Button title="Sign Up" onPress={signUp} />
+      <Pressable onPress={signUp} style={styles.button}>
+        <Text style={styles.buttonText}>Sign Up</Text>
+      </Pressable>
 
       {result && <Text style={styles.result}>{result}</Text>}
+      <Pressable onPress={() => router.push('/(tabs)/account/login')} style={{ marginTop: 12 }}>
+        <Text style={{ color: 'blue' }}>Already have an account? Log in</Text>
+      </Pressable>
     </View>
   );
 }

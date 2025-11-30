@@ -2,7 +2,7 @@ import AuthService from '@/src/services/auth.service';
 import { styles } from '@/src/styles/account.styles';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -40,17 +40,18 @@ export default function LoginScreen() {
         style={styles.input}
       />
 
-      <Pressable onPress={signIn} style={styles.button}>
-        <Text style={styles.buttonText}>Log in</Text>
-      </Pressable>
+        <TouchableOpacity onPress={signIn} style={styles.button} activeOpacity={0.7}>
+          <Text style={styles.buttonText}>Log in</Text>
+        </TouchableOpacity>
 
       {result && <Text style={styles.result}>{result}</Text>}
-      <Pressable
+      <TouchableOpacity
         onPress={() => router.push('/(tabs)/account/signup')}
         style={{ marginTop: 12 }}
+        activeOpacity={0.7}
       >
         <Text style={{ color: 'blue' }}>Don't have an account? Create one</Text>
-      </Pressable>
+      </TouchableOpacity>
     </View>
   );
 }

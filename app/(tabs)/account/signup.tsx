@@ -2,7 +2,7 @@ import SignupService from '@/src/services/signup.service';
 import { styles } from '@/src/styles/account.styles';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function SignUpScreen() {
   const [email, setEmail] = useState('');
@@ -39,14 +39,18 @@ export default function SignUpScreen() {
         style={styles.input}
       />
 
-      <Pressable onPress={signUp} style={styles.button}>
+      <TouchableOpacity onPress={signUp} style={styles.button} activeOpacity={0.7}>
         <Text style={styles.buttonText}>Sign Up</Text>
-      </Pressable>
+      </TouchableOpacity>
 
       {result && <Text style={styles.result}>{result}</Text>}
-      <Pressable onPress={() => router.push('/(tabs)/account/login')} style={{ marginTop: 12 }}>
+      <TouchableOpacity
+        onPress={() => router.push('/(tabs)/account/login')}
+        style={{ marginTop: 12 }}
+        activeOpacity={0.7}
+      >
         <Text style={{ color: 'blue' }}>Already have an account? Log in</Text>
-      </Pressable>
+      </TouchableOpacity>
     </View>
   );
 }

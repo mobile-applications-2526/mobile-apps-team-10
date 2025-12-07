@@ -1,20 +1,5 @@
 import { supabase } from "@/src/supabase/supabase";
-
-export type Ingredient = {
-  ingredient_id: number;
-  quantity: number;
-  unit: string;
-  ingredients: { name: string };
-};
-
-export type Recipe = {
-  id: number;
-  title: string;
-  description: string;
-  steps: string[];
-  recipe_ingredients: Ingredient[];
-};
-
+import { Recipe } from "../types";
 export class RecipesService {
   async fetchAll(): Promise<Recipe[]> {
     const { data, error } = await supabase.from("recipes").select(`
@@ -34,7 +19,7 @@ export class RecipesService {
       throw error;
     }
 
-    return (data as Recipe[]) ?? [];
+    return (data as unknown as Recipe[]) ?? [];
   }
 
   filterByIngredients(

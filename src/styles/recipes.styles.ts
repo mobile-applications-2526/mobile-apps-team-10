@@ -129,6 +129,10 @@ export const styles = StyleSheet.create({
     color: theme.colors.white,
     fontWeight: theme.fontWeights.bold,
   },
+  loadingContainer: {
+    marginTop: theme.spacing.xl,
+    alignItems: "center",
+  },
 });
 
 export default styles;

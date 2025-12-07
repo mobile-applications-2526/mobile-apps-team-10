@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { TouchableOpacity, View, Text } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
 export default function LoginModal({
   setShowLoginModal,
@@ -39,7 +39,7 @@ export default function LoginModal({
           }}
           style={{
             padding: 10,
-            backgroundColor: "#007AFF",
+            backgroundColor: "tomato",
             borderRadius: 8,
             marginBottom: 10,
           }}

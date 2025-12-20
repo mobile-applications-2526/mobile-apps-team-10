@@ -3,6 +3,7 @@ import { Tabs } from "expo-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/src/supabase/supabase";
 import { User } from "@supabase/supabase-js";
+import { FavoritesProvider } from "@/src/context/FavoritesContext";
 
 export default function RootLayout() {
   const [user, setUser] = useState<User | null | undefined>(undefined);
@@ -33,6 +34,7 @@ export default function RootLayout() {
   if (checking) return null;
 
   return (
+      <FavoritesProvider>
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -78,5 +80,6 @@ export default function RootLayout() {
         options={{ href: null }}
       />
     </Tabs>
+    </FavoritesProvider>
   );
 }

@@ -7,7 +7,6 @@ export default function RecipesLayout() {
       <Stack.Screen
         name="[id]"
         options={{
-          // this allows to swipe from left to right to return
           gestureEnabled: true,
           headerShown: false,
         }}

@@ -73,8 +73,6 @@ export default function RecipeDetail() {
           {recipe.description}
         </Text>
       )}
-
-      {/* Add ingredients, steps, whatever */}
     </ScrollView>
   );
 }

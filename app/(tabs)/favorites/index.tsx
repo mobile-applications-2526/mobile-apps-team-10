@@ -19,7 +19,6 @@ export default function FavoritesScreen() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  // ADDED: State to track which recipes are folded open
   const [expandedIds, setExpandedIds] = useState<number[]>([]);
 
   useEffect(() => {
@@ -46,7 +45,6 @@ export default function FavoritesScreen() {
     setRefreshing(false);
   };
 
-  // ADDED: Toggle function for folding open/closed
   const toggleExpand = (id: number) => {
     setExpandedIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
@@ -73,7 +71,7 @@ export default function FavoritesScreen() {
               <TouchableOpacity
                 key={r.id}
                 style={styles.card}
-                onPress={() => toggleExpand(r.id)} // Changed from router.push to toggleExpand
+                onPress={() => toggleExpand(r.id)}
               >
                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                   <View style={{ flex: 1 }}>
@@ -85,7 +83,6 @@ export default function FavoritesScreen() {
                   </TouchableOpacity>
                 </View>
 
-                {/* ADDED: The "Fold Open" content */}
                 {isExpanded && (
                   <View style={{ marginTop: 15, borderTopWidth: 1, borderTopColor: '#eee', paddingTop: 10 }}>
                     <Text style={{ fontWeight: 'bold', marginBottom: 5 }}>Ingredients:</Text>

@@ -5,12 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="acd62cc9-0072-4797-ac3c-39963de82ac3" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/(tabs)/favorites/_layout.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/context/FavoritesContent.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/favorites.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/favorites/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/recipes/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/recipes/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/_layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/_layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/favorites/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/favorites/index.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

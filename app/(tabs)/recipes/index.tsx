@@ -28,6 +28,7 @@ export default function FetchRecipes() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [servingsById, setServingsById] = useState<Record<number, number>>({});
 
   useEffect(() => {
     const load = async () => {
@@ -71,6 +72,17 @@ export default function FetchRecipes() {
       return;
     }
     await toggleFavorite(id);
+  };
+
+  const getServings = (id: number) => servingsById[id] ?? 1;
+  const setServings = (id: number, value: number) => setServingsById((prev) => ({ ...prev, [id]: value }));
+  const increaseServings = (id: number) => setServings(id, getServings(id) + 1);
+  const decreaseServings = (id: number) => setServings(id, Math.max(1, getServings(id) - 1));
+
+  const formatQuantity = (value: number) => {
+    if (Number.isInteger(value)) return value.toString();
+    const rounded = Math.round(value * 100) / 100;
+    return rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toString();
   };
 
   if (loading) return <View style={styles.loadingContainer}><ActivityIndicator /></View>;
@@ -126,10 +138,35 @@ export default function FetchRecipes() {
               <Text style={styles.description}>{recipe.description}</Text>
               {isExpanded && (
                 <>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8, marginBottom: 6 }}>
+                    <Text style={{ marginRight: 8 }}>Persons:</Text>
+                    <TouchableOpacity onPress={(e) => {
+                        e.stopPropagation();
+                        decreaseServings(recipe.id); }}
+                        style={{ paddingHorizontal: 10, paddingVertical: 6, backgroundColor: '#eee', borderRadius: 6, marginRight: 8 }}
+                    >
+                      <Text>-</Text>
+                    </TouchableOpacity>
+                    <View style={{ minWidth: 32, alignItems: 'center' }}>
+                      <Text>{getServings(recipe.id)}</Text>
+                    </View>
+                    <TouchableOpacity onPress={(e) => {
+                        e.stopPropagation();
+                        increaseServings(recipe.id); }}
+                        style={{ paddingHorizontal: 10, paddingVertical: 6, backgroundColor: '#eee', borderRadius: 6, marginLeft: 8 }}
+                    >
+                      <Text>+</Text>
+                    </TouchableOpacity>
+                  </View>
+
                   <Text style={styles.subheading}>Ingredients:</Text>
-                  {recipe.recipe_ingredients.map((ri) => (
-                    <Text key={ri.ingredient_id} style={styles.ingredient}>{ri.quantity} {ri.unit} {ri.ingredients.name}</Text>
-                  ))}
+                  {recipe.recipe_ingredients.map((ri) => {
+                    const servings = getServings(recipe.id);
+                    const scaled = (ri.quantity * servings) / 1;
+                    return (
+                      <Text key={ri.ingredient_id} style={styles.ingredient}>{formatQuantity(scaled)} {ri.unit} {ri.ingredients.name}</Text>
+                    );
+                  })}
                   <Text style={styles.subheading}>Steps:</Text>
                   {recipe.steps.map((step, index) => <Text key={index} style={styles.step}>{index + 1}. {step}</Text>)}
                 </>

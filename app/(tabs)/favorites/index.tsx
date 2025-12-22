@@ -1,7 +1,7 @@
 import { useFavorites } from "@/src/context/FavoritesContext";
 import RecipesService from "@/src/services/recipes.service";
 import { favoritesStyles as styles } from "@/src/styles/favorites.styles";
-import { supabase } from "@/src/supabase/supabase";
+import SessionService from "@/src/services/session.service";
 import { User } from "@supabase/supabase-js";
 import { Recipe } from "@types";
 import { useFocusEffect } from "expo-router";
@@ -20,8 +20,8 @@ export default function FavoritesScreen() {
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null));
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => setUser(session?.user ?? null));
+    SessionService.getUser().then(({ data }) => setUser(data.user ?? null));
+    const { data: listener } = SessionService.onAuthStateChange((_event, session) => setUser(session?.user ?? null));
     return () => listener.subscription.unsubscribe();
   }, []);
 

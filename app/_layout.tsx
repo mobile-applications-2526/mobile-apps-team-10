@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { useEffect, useState } from "react";
-import { supabase } from "@/src/supabase/supabase";
+import SessionService from "@/src/services/session.service";
 import { User } from "@supabase/supabase-js";
 import { FavoritesProvider } from "@/src/context/FavoritesContext";
 
@@ -12,14 +12,14 @@ export default function RootLayout() {
   useEffect(() => {
     let mounted = true;
     const checkUser = async () => {
-      const { data } = await supabase.auth.getUser();
+      const { data } = await SessionService.getUser();
       if (!mounted) return;
       setUser(data.user ?? null);
       setChecking(false);
     };
     checkUser();
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: listener } = SessionService.onAuthStateChange((_event, session) => {
       if (!mounted) return;
       setUser(session?.user ?? null);
       setChecking(false);

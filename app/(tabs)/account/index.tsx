@@ -1,6 +1,6 @@
 import AuthService from '@/src/services/auth.service';
+import SessionService from '@/src/services/session.service';
 import { styles } from '@/src/styles/account.styles';
-import { supabase } from '@/src/supabase/supabase';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -15,7 +15,7 @@ export default function AccountIndex() {
     let mounted = true;
 
     const init = async () => {
-      const { data } = await supabase.auth.getSession();
+      const { data } = await SessionService.getSession();
       if (!mounted) return;
       setUser(data.session?.user ?? null);
       setLoading(false);
@@ -23,7 +23,7 @@ export default function AccountIndex() {
 
     init();
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: listener } = SessionService.onAuthStateChange((_event, session) => {
       if (!mounted) return;
       setUser(session?.user ?? null);
     });
@@ -52,16 +52,16 @@ export default function AccountIndex() {
       <Text style={styles.title}>Account</Text>
       <Text style={{ marginBottom: 12 }}>{user.email}</Text>
       <TouchableOpacity
-  onPress={async () => {
-    await AuthService.signOut();
-    setUser(null);
-    router.replace('/(tabs)/account');
-  }}
-  style={styles.button}
-  activeOpacity={0.7}
->
-  <Text style={styles.buttonText}>Log out</Text>
-</TouchableOpacity>
+        onPress={async () => {
+          await AuthService.signOut();
+          setUser(null);
+          router.replace('/(tabs)/account');
+        }}
+        style={styles.button}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.buttonText}>Log out</Text>
+      </TouchableOpacity>
     </View>
   );
 }

@@ -1,7 +1,7 @@
 import { useFavorites } from "@/src/context/FavoritesContext";
 import RecipesService from "@/src/services/recipes.service";
 import { styles } from "@/src/styles/recipes.styles";
-import { supabase } from "@/src/supabase/supabase";
+import SessionService from "@/src/services/session.service";
 import { User } from "@supabase/supabase-js";
 import { Recipe } from "@types";
 import { useEffect, useState } from "react";
@@ -32,11 +32,11 @@ export default function FetchRecipes() {
 
   useEffect(() => {
     const load = async () => {
-      const { data } = await supabase.auth.getSession();
+      const { data } = await SessionService.getSession();
       setUser(data.session?.user ?? null);
     };
     load();
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: listener } = SessionService.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
     return () => listener.subscription.unsubscribe();

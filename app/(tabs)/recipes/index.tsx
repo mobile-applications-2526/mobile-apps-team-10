@@ -1,4 +1,4 @@
-import { useFavorites } from "@/src/context/FavoritesContext"; // Import the hook
+import { useFavorites } from "@/src/context/FavoritesContext";
 import RecipesService from "@/src/services/recipes.service";
 import { styles } from "@/src/styles/recipes.styles";
 import { supabase } from "@/src/supabase/supabase";
@@ -18,7 +18,7 @@ import LoginModal from "../../(modals)/LoginModal";
 import ExpandableRecipe from "@/src/components/ExpandableRecipe";
 
 export default function FetchRecipes() {
-  const { favorites, toggleFavorite, refreshFavorites } = useFavorites(); // Use global context
+  const { favorites, toggleFavorite, refreshFavorites } = useFavorites();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedIds, setExpandedIds] = useState<number[]>([]);
@@ -107,7 +107,7 @@ export default function FetchRecipes() {
           value={maxTime?.toString() ?? ""}
           onChangeText={(text) => {
               if (text.trim() === "") {
-                  setMaxTime(null); // ✅ remove filter
+                  setMaxTime(null);
                   return;
                 }
             const value = Number(text);

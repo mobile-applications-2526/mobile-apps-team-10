@@ -43,6 +43,12 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSizes.sm,
     color: theme.colors.text,
   },
+  linkSpacing: {
+    marginTop: theme.spacing.sm,
+  },
+  linkText: {
+    color: theme.colors.primary,
+  },
 });
 
 export default styles;

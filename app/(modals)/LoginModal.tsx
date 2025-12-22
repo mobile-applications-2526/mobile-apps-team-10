@@ -1,5 +1,6 @@
 import { router } from "expo-router";
 import { Text, TouchableOpacity, View } from "react-native";
+import { modalStyles as styles } from "@/src/styles/modal.styles";
 
 export default function LoginModal({
   setShowLoginModal,
@@ -7,27 +8,9 @@ export default function LoginModal({
   setShowLoginModal: (show: boolean) => void;
 }) {
   return (
-    <View
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: "rgba(0,0,0,0.5)",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <View
-        style={{
-          backgroundColor: "white",
-          padding: 20,
-          borderRadius: 10,
-          width: "80%",
-        }}
-      >
-        <Text style={{ fontSize: 18, marginBottom: 10 }}>
+    <View style={styles.overlay}>
+      <View style={styles.box}>
+        <Text style={styles.text}>
           You need to be logged in to favorite recipes.
         </Text>
 
@@ -37,18 +20,13 @@ export default function LoginModal({
             // navigate to login page
             router.push("/(tabs)/account/login");
           }}
-          style={{
-            padding: 10,
-            backgroundColor: "tomato",
-            borderRadius: 8,
-            marginBottom: 10,
-          }}
+          style={styles.loginButton}
         >
-          <Text style={{ color: "white", textAlign: "center" }}>Log in</Text>
+          <Text style={styles.loginButtonText}>Log in</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => setShowLoginModal(false)}>
-          <Text style={{ textAlign: "center" }}>Close</Text>
+          <Text style={styles.closeText}>Close</Text>
         </TouchableOpacity>
       </View>
     </View>

@@ -1,6 +1,6 @@
 import { useFavorites } from "@/src/context/FavoritesContext";
 import RecipesService from "@/src/services/recipes.service";
-import { favoritesStyles as styles } from "@/src/styles/favorites.styles"; // Note: you might need to add expanded styles here or use recipes.styles
+import { favoritesStyles as styles } from "@/src/styles/favorites.styles";
 import { supabase } from "@/src/supabase/supabase";
 import { User } from "@supabase/supabase-js";
 import { Recipe } from "@types";

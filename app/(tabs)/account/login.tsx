@@ -51,10 +51,10 @@ export default function LoginScreen() {
       {result && <Text style={styles.result}>{result}</Text>}
       <TouchableOpacity
         onPress={() => router.push("/(tabs)/account/signup")}
-        style={{ marginTop: 12 }}
+        style={styles.linkSpacing}
         activeOpacity={0.7}
       >
-        <Text style={{ color: "blue" }}>Don't have an account? Create one</Text>
+        <Text style={styles.linkText}>Don't have an account? Create one</Text>
       </TouchableOpacity>
     </View>
   );

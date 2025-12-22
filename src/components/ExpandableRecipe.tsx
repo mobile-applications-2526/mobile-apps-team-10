@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Recipe } from "@types";
-import { View, Text, TouchableOpacity, StyleSheet, ViewStyle, TextStyle, GestureResponderEvent } from "react-native";
+import { View, Text, TouchableOpacity, ViewStyle, TextStyle, GestureResponderEvent } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { expandableStyles as styles } from "@/src/styles/expandable.styles";
 
 interface Props {
   recipe: Recipe;
@@ -101,29 +102,3 @@ export default function ExpandableRecipe({
     </TouchableOpacity>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    padding: 12,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.03,
-    shadowRadius: 4,
-    elevation: 1,
-  },
-  rowBetween: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  title: { fontSize: 16, fontWeight: "700", flex: 1 },
-  description: { color: "#333", opacity: 0.8, marginTop: 6 },
-  time: { marginTop: 6, color: "#333", opacity: 0.8 },
-  expandedSection: { marginTop: 8 },
-  servingsRow: { flexDirection: "row", alignItems: "center", marginBottom: 8 },
-  personsLabel: { marginRight: 8 },
-  servingsButton: { paddingHorizontal: 10, paddingVertical: 6, backgroundColor: "#eee", borderRadius: 6, marginRight: 8 },
-  servingsCount: { minWidth: 32, alignItems: "center" },
-  subheading: { fontWeight: "700", marginTop: 6, marginBottom: 4 },
-  ingredient: { marginBottom: 4 },
-  step: { marginBottom: 4 },
-});
-

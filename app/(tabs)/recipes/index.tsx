@@ -107,6 +107,10 @@ export default function FetchRecipes() {
           keyboardType="numeric"
           value={maxTime?.toString() ?? ""}
           onChangeText={(text) => {
+              if (text.trim() === "") {
+                  setMaxTime(null); // ✅ remove filter
+                  return;
+                }
             const value = Number(text);
             setMaxTime(isNaN(value) ? null : value);
           }}

@@ -7,6 +7,7 @@ export class RecipesService {
         title,
         description,
         steps,
+        time_minutes,
         recipe_ingredients (
           quantity,
           unit,
@@ -21,6 +22,16 @@ export class RecipesService {
 
     return (data as unknown as Recipe[]) ?? [];
   }
+
+  filterByTime(recipes: Recipe[], maxTime: number | null): Recipe[] {
+  if (maxTime === null) return recipes;
+
+  return recipes.filter(
+    (recipe) =>
+      recipe.time_minutes !== null &&
+      recipe.time_minutes <= maxTime
+  );
+}
 
   filterByIngredients(
     recipes: Recipe[],

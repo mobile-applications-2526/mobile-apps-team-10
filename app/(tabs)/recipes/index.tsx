@@ -28,6 +28,8 @@ export default function FetchRecipes() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [maxTime, setMaxTime] = useState<number | null>(null);
+
 
   useEffect(() => {
     const load = async () => {
@@ -62,8 +64,11 @@ export default function FetchRecipes() {
   }, []);
 
   useEffect(() => {
-    setFilteredRecipes(RecipesService.filterByIngredients(recipes, selectedIngredients));
-  }, [selectedIngredients, recipes]);
+    let result = RecipesService.filterByIngredients(recipes, selectedIngredients);
+    result = RecipesService.filterByTime(result, maxTime);
+    setFilteredRecipes(result);
+  }, [selectedIngredients, maxTime, recipes]);
+
 
   const handleToggleFavorite = async (id: number) => {
     if (!user) {
@@ -95,6 +100,19 @@ export default function FetchRecipes() {
         </TouchableOpacity>
       </View>
 
+      <View style={styles.filterSection}>
+        <TextInput
+          style={styles.input}
+          placeholder="Max time (minutes)"
+          keyboardType="numeric"
+          value={maxTime?.toString() ?? ""}
+          onChangeText={(text) => {
+            const value = Number(text);
+            setMaxTime(isNaN(value) ? null : value);
+          }}
+        />
+      </View>
+
       <View style={styles.selectedList}>
         {selectedIngredients.map((ing) => (
           <View key={ing} style={styles.selectedItem}>
@@ -114,27 +132,66 @@ export default function FetchRecipes() {
           const isExpanded = expandedIds.includes(recipe.id);
           const isFav = favorites.includes(recipe.id);
           return (
-            <TouchableOpacity key={recipe.id} style={styles.recipeCard} onPress={() => {
-              setExpandedIds(prev => prev.includes(recipe.id) ? prev.filter(i => i !== recipe.id) : [...prev, recipe.id]);
-            }}>
+            <TouchableOpacity
+              key={recipe.id}
+              style={styles.recipeCard}
+              onPress={() => {
+                setExpandedIds((prev) =>
+                  prev.includes(recipe.id)
+                    ? prev.filter((i) => i !== recipe.id)
+                    : [...prev, recipe.id]
+                );
+              }}
+            >
+              {/* Title + favorite */}
               <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                 <Text style={styles.title}>{recipe.title}</Text>
-                <TouchableOpacity onPress={(e) => { e.stopPropagation(); handleToggleFavorite(recipe.id); }}>
-                  <Ionicons name={isFav ? "heart" : "heart-outline"} size={24} color={isFav ? "red" : "black"} />
+                <TouchableOpacity
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    handleToggleFavorite(recipe.id);
+                  }}
+                >
+                  <Ionicons
+                    name={isFav ? "heart" : "heart-outline"}
+                    size={24}
+                    color={isFav ? "red" : "black"}
+                  />
                 </TouchableOpacity>
               </View>
-              <Text style={styles.description}>{recipe.description}</Text>
+
+              {/* Description */}
+              {recipe.description && (
+                <Text style={styles.description}>{recipe.description}</Text>
+              )}
+
+              {/* ✅ ALWAYS visible */}
+              {recipe.time_minutes !== null && (
+                <Text style={styles.time}>
+                  ⏱ {recipe.time_minutes} min
+                </Text>
+              )}
+
+              {/* Expanded content */}
               {isExpanded && (
                 <>
-                  <Text style={styles.subheading}>Ingredients:</Text>
+                  <Text style={styles.subheading}>Ingredients</Text>
                   {recipe.recipe_ingredients.map((ri) => (
-                    <Text key={ri.ingredient_id} style={styles.ingredient}>{ri.quantity} {ri.unit} {ri.ingredients.name}</Text>
+                    <Text key={ri.ingredient_id} style={styles.ingredient}>
+                      {ri.quantity} {ri.unit} {ri.ingredients.name}
+                    </Text>
                   ))}
-                  <Text style={styles.subheading}>Steps:</Text>
-                  {recipe.steps.map((step, index) => <Text key={index} style={styles.step}>{index + 1}. {step}</Text>)}
+
+                  <Text style={styles.subheading}>Steps</Text>
+                  {recipe.steps.map((step, index) => (
+                    <Text key={index} style={styles.step}>
+                      {index + 1}. {step}
+                    </Text>
+                  ))}
                 </>
               )}
             </TouchableOpacity>
+
           );
         })}
       </ScrollView>

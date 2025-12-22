@@ -73,6 +73,20 @@ export default function RecipeDetail() {
           {recipe.description}
         </Text>
       )}
+
+      {recipe.time_minutes !== null && recipe.time_minutes !== undefined && (
+        <Text
+          style={{
+            fontSize: theme.fontSizes.md,
+            color: theme.colors.text,
+            opacity: 0.7,
+            marginBottom: theme.spacing.md,
+          }}
+        >
+          ⏱ {recipe.time_minutes} minutes
+        </Text>
+      )}
+
     </ScrollView>
   );
 }

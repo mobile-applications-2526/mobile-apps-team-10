@@ -10,5 +10,6 @@ export type Recipe = {
   title: string;
   description: string;
   steps: string[];
+  time_minutes: number | null;
   recipe_ingredients: Ingredient[];
 };

@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Recipe } from "@types";
-import { View, Text, TouchableOpacity, ViewStyle, TextStyle, GestureResponderEvent } from "react-native";
+import { View, Text, TouchableOpacity, ViewStyle, TextStyle, GestureResponderEvent, Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { expandableStyles as styles } from "@/src/styles/expandable.styles";
 
@@ -33,15 +33,49 @@ export default function ExpandableRecipe({
 }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [servings, setServings] = useState<number>(1);
+  const [checkedIds, setCheckedIds] = useState<number[]>([]);
+
+  const storageKey = `checklist:${recipe.id}`;
+
+  useEffect(() => {
+   try {
+      if (typeof localStorage !== "undefined") {
+        const raw = localStorage.getItem(storageKey);
+        if (raw) {
+          setCheckedIds(JSON.parse(raw));
+        }
+      }
+    } catch (err) {
+    }
+  }, [storageKey]);
+
+  useEffect(() => {
+    try {
+      if (typeof localStorage !== "undefined") {
+        localStorage.setItem(storageKey, JSON.stringify(checkedIds));
+      }
+    } catch (err) {
+    }
+  }, [checkedIds, storageKey]);
+
+  const toggleChecked = (ingredientId: number, e?: GestureResponderEvent) => {
+    e?.stopPropagation();
+    setCheckedIds((prev) => {
+      if (prev.includes(ingredientId)) return prev.filter((id) => id !== ingredientId);
+      return [...prev, ingredientId];
+    });
+  };
 
   const toggleExpanded = () => setExpanded((s) => !s);
   const increase = (e?: GestureResponderEvent) => {
     e?.stopPropagation();
     setServings((s) => s + 1);
+    setCheckedIds([]);
   };
   const decrease = (e?: GestureResponderEvent) => {
     e?.stopPropagation();
     setServings((s) => Math.max(1, s - 1));
+    setCheckedIds([]);
   };
 
   const handleToggleFavorite = (e?: GestureResponderEvent) => {
@@ -88,8 +122,22 @@ export default function ExpandableRecipe({
           <Text style={[styles.subheading, subheadingStyle]}>Ingredients:</Text>
           {recipe.recipe_ingredients?.map((ri) => {
             const scaled = (ri.quantity * servings) / 1;
+            const checked = checkedIds.includes(ri.ingredient_id);
             return (
-              <Text key={ri.ingredient_id} style={[styles.ingredient, ingredientStyle]}>• {formatQuantity(scaled)} {ri.unit} {ri.ingredients.name}</Text>
+              <View key={ri.ingredient_id} style={styles.ingredientRow}>
+                <TouchableOpacity onPress={(e) => toggleChecked(ri.ingredient_id, e)} style={styles.checkboxTouchable}>
+                  <Ionicons
+                    name={checked ? "checkmark-circle" : "ellipse-outline"}
+                    size={20}
+                    color={checked ? "green" : "gray"}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={(e) => toggleChecked(ri.ingredient_id, e)} style={{ flex: 1 }}>
+                  <Text style={[styles.ingredientText, checked ? styles.ingredientChecked : null]}>
+                    {formatQuantity(scaled)} {ri.unit} {ri.ingredients.name}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             );
           })}
 

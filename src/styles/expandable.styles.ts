@@ -24,6 +24,23 @@ export const expandableStyles = StyleSheet.create({
   subheading: { fontWeight: theme.fontWeights.semibold, marginTop: theme.spacing.sm, marginBottom: theme.spacing.xs },
   ingredient: { marginBottom: 4, color: theme.colors.text },
   step: { marginBottom: 4, color: theme.colors.text },
+  ingredientRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 6,
+  },
+  checkboxTouchable: {
+    padding: 6,
+    marginRight: 8,
+  },
+  ingredientText: {
+    flex: 1,
+    color: theme.colors.text,
+  },
+  ingredientChecked: {
+    textDecorationLine: "line-through",
+    color: theme.colors.placeholder,
+  },
 });
 
 export default expandableStyles;

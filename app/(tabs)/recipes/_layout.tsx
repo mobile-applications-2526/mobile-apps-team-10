@@ -4,13 +4,6 @@ export default function RecipesLayout() {
   return (
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen
-        name="[id]"
-        options={{
-          gestureEnabled: true,
-          headerShown: false,
-        }}
-      />
-    </Stack>
+      </Stack>
   );
 }

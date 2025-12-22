@@ -1,8 +1,7 @@
-import { useFavorites } from "@/src/context/FavoritesContext"; // Import the hook
+import { useFavorites } from "@/src/context/FavoritesContext";
 import RecipesService from "@/src/services/recipes.service";
 import { styles } from "@/src/styles/recipes.styles";
-import { supabase } from "@/src/supabase/supabase";
-import { Ionicons } from "@expo/vector-icons";
+import SessionService from "@/src/services/session.service";
 import { User } from "@supabase/supabase-js";
 import { Recipe } from "@types";
 import { useEffect, useState } from "react";
@@ -16,9 +15,10 @@ import {
   View,
 } from "react-native";
 import LoginModal from "../../(modals)/LoginModal";
+import ExpandableRecipe from "@/src/components/ExpandableRecipe";
 
 export default function FetchRecipes() {
-  const { favorites, toggleFavorite, refreshFavorites } = useFavorites(); // Use global context
+  const { favorites, toggleFavorite, refreshFavorites } = useFavorites();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedIds, setExpandedIds] = useState<number[]>([]);
@@ -30,14 +30,13 @@ export default function FetchRecipes() {
   const [refreshing, setRefreshing] = useState(false);
   const [maxTime, setMaxTime] = useState<number | null>(null);
 
-
   useEffect(() => {
     const load = async () => {
-      const { data } = await supabase.auth.getSession();
+      const { data } = await SessionService.getSession();
       setUser(data.session?.user ?? null);
     };
     load();
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: listener } = SessionService.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
     return () => listener.subscription.unsubscribe();
@@ -108,7 +107,7 @@ export default function FetchRecipes() {
           value={maxTime?.toString() ?? ""}
           onChangeText={(text) => {
               if (text.trim() === "") {
-                  setMaxTime(null); // ✅ remove filter
+                  setMaxTime(null);
                   return;
                 }
             const value = Number(text);
@@ -134,68 +133,15 @@ export default function FetchRecipes() {
       >
         {filteredRecipes.map((recipe) => {
           const isExpanded = expandedIds.includes(recipe.id);
-          const isFav = favorites.includes(recipe.id);
           return (
-            <TouchableOpacity
+            <ExpandableRecipe
               key={recipe.id}
-              style={styles.recipeCard}
-              onPress={() => {
-                setExpandedIds((prev) =>
-                  prev.includes(recipe.id)
-                    ? prev.filter((i) => i !== recipe.id)
-                    : [...prev, recipe.id]
-                );
-              }}
-            >
-              {/* Title + favorite */}
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                <Text style={styles.title}>{recipe.title}</Text>
-                <TouchableOpacity
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    handleToggleFavorite(recipe.id);
-                  }}
-                >
-                  <Ionicons
-                    name={isFav ? "heart" : "heart-outline"}
-                    size={24}
-                    color={isFav ? "red" : "black"}
-                  />
-                </TouchableOpacity>
-              </View>
-
-              {/* Description */}
-              {recipe.description && (
-                <Text style={styles.description}>{recipe.description}</Text>
-              )}
-
-              {/* ✅ ALWAYS visible */}
-              {recipe.time_minutes !== null && (
-                <Text style={styles.time}>
-                  ⏱ {recipe.time_minutes} min
-                </Text>
-              )}
-
-              {/* Expanded content */}
-              {isExpanded && (
-                <>
-                  <Text style={styles.subheading}>Ingredients</Text>
-                  {recipe.recipe_ingredients.map((ri) => (
-                    <Text key={ri.ingredient_id} style={styles.ingredient}>
-                      {ri.quantity} {ri.unit} {ri.ingredients.name}
-                    </Text>
-                  ))}
-
-                  <Text style={styles.subheading}>Steps</Text>
-                  {recipe.steps.map((step, index) => (
-                    <Text key={index} style={styles.step}>
-                      {index + 1}. {step}
-                    </Text>
-                  ))}
-                </>
-              )}
-            </TouchableOpacity>
-
+              recipe={recipe}
+              isFavorite={favorites.includes(recipe.id)}
+              onToggleFavorite={(id) => handleToggleFavorite(id)}
+              showServingsControls={true}
+              containerStyle={styles.recipeCard}
+            />
           );
         })}
       </ScrollView>

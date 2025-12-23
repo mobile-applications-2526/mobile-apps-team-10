@@ -53,8 +53,16 @@ export default function FavoritesScreen() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await Promise.all([loadAll(), refreshFavorites()]);
-    setRefreshing(false);
+    try {
+      await refreshFavorites().catch((err) =>
+        console.warn("Failed to refresh favorites:", err)
+      );
+      await loadAll().catch((err) =>
+        console.warn("Failed to load recipes:", err)
+      );
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   const favoriteRecipes = allRecipes.filter((r) => favorites.includes(r.id));

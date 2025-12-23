@@ -1,15 +1,19 @@
-import AuthService from '@/src/services/auth.service';
-import SessionService from '@/src/services/session.service';
-import { styles } from '@/src/styles/account.styles';
-import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
-import LoginScreen from './login';
+import AuthService from "@/src/services/auth.service";
+import SessionService from "@/src/services/session.service";
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
+import LoginScreen from "./login";
+import { createAccountStyles } from "@/src/styles/account.styles";
+import { useTheme } from "@/src/hooks/useTheme";
 
 export default function AccountIndex() {
   const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  const theme = useTheme();
+  const styles = createAccountStyles(theme as any);
 
   useEffect(() => {
     let mounted = true;
@@ -23,10 +27,12 @@ export default function AccountIndex() {
 
     init();
 
-    const { data: listener } = SessionService.onAuthStateChange((_event, session) => {
-      if (!mounted) return;
-      setUser(session?.user ?? null);
-    });
+    const { data: listener } = SessionService.onAuthStateChange(
+      (_event, session) => {
+        if (!mounted) return;
+        setUser(session?.user ?? null);
+      }
+    );
 
     return () => {
       mounted = false;
@@ -55,7 +61,7 @@ export default function AccountIndex() {
         onPress={async () => {
           await AuthService.signOut();
           setUser(null);
-          router.replace('/(tabs)/account');
+          router.replace("/(tabs)/account");
         }}
         style={styles.button}
         activeOpacity={0.7}

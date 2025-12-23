@@ -1,7 +1,9 @@
+import ExpandableRecipe from "@/src/components/ExpandableRecipe";
 import { useFavorites } from "@/src/context/FavoritesContext";
+import { useTheme } from "@/src/hooks/useTheme";
 import RecipesService from "@/src/services/recipes.service";
-import { styles } from "@/src/styles/recipes.styles";
 import SessionService from "@/src/services/session.service";
+import { createRecipeStyles } from "@/src/styles/recipes.styles";
 import { User } from "@supabase/supabase-js";
 import { Recipe } from "@types";
 import { useEffect, useState } from "react";
@@ -15,7 +17,6 @@ import {
   View,
 } from "react-native";
 import LoginModal from "../../(modals)/LoginModal";
-import ExpandableRecipe from "@/src/components/ExpandableRecipe";
 
 export default function FetchRecipes() {
   const { favorites, toggleFavorite, refreshFavorites } = useFavorites();
@@ -30,15 +31,20 @@ export default function FetchRecipes() {
   const [refreshing, setRefreshing] = useState(false);
   const [maxTime, setMaxTime] = useState<number | null>(null);
 
+  const theme = useTheme();
+  const styles = createRecipeStyles(theme as any);
+
   useEffect(() => {
     const load = async () => {
       const { data } = await SessionService.getSession();
       setUser(data.session?.user ?? null);
     };
     load();
-    const { data: listener } = SessionService.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
+    const { data: listener } = SessionService.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
     return () => listener.subscription.unsubscribe();
   }, []);
 
@@ -52,7 +58,9 @@ export default function FetchRecipes() {
     try {
       const data = await RecipesService.fetchAll();
       setRecipes(data);
-      setFilteredRecipes(RecipesService.filterByIngredients(data, selectedIngredients));
+      setFilteredRecipes(
+        RecipesService.filterByIngredients(data, selectedIngredients)
+      );
     } catch (err) {
       console.log("Failed to load recipes", err);
     }
@@ -63,11 +71,13 @@ export default function FetchRecipes() {
   }, []);
 
   useEffect(() => {
-    let result = RecipesService.filterByIngredients(recipes, selectedIngredients);
+    let result = RecipesService.filterByIngredients(
+      recipes,
+      selectedIngredients
+    );
     result = RecipesService.filterByTime(result, maxTime);
     setFilteredRecipes(result);
   }, [selectedIngredients, maxTime, recipes]);
-
 
   const handleToggleFavorite = async (id: number) => {
     if (!user) {
@@ -77,11 +87,18 @@ export default function FetchRecipes() {
     await toggleFavorite(id);
   };
 
-  if (loading) return <View style={styles.loadingContainer}><ActivityIndicator /></View>;
+  if (loading)
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator />
+      </View>
+    );
 
   return (
     <View style={styles.screen}>
-      <View style={styles.header}><Text style={styles.pageTitle}>Recipes</Text></View>
+      <View style={styles.header}>
+        <Text style={styles.pageTitle}>Recipes</Text>
+      </View>
 
       <View style={styles.filterSection}>
         <TextInput
@@ -90,11 +107,15 @@ export default function FetchRecipes() {
           value={filterText}
           onChangeText={setFilterText}
         />
-        <TouchableOpacity style={styles.addButton} onPress={() => {
-          const ing = filterText.trim().toLowerCase();
-          if (ing && !selectedIngredients.includes(ing)) setSelectedIngredients([...selectedIngredients, ing]);
-          setFilterText("");
-        }}>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => {
+            const ing = filterText.trim().toLowerCase();
+            if (ing && !selectedIngredients.includes(ing))
+              setSelectedIngredients([...selectedIngredients, ing]);
+            setFilterText("");
+          }}
+        >
           <Text style={styles.addButtonText}>Add</Text>
         </TouchableOpacity>
       </View>
@@ -106,10 +127,10 @@ export default function FetchRecipes() {
           keyboardType="numeric"
           value={maxTime?.toString() ?? ""}
           onChangeText={(text) => {
-              if (text.trim() === "") {
-                  setMaxTime(null);
-                  return;
-                }
+            if (text.trim() === "") {
+              setMaxTime(null);
+              return;
+            }
             const value = Number(text);
             setMaxTime(isNaN(value) ? null : value);
           }}
@@ -120,7 +141,13 @@ export default function FetchRecipes() {
         {selectedIngredients.map((ing) => (
           <View key={ing} style={styles.selectedItem}>
             <Text>{ing}</Text>
-            <TouchableOpacity onPress={() => setSelectedIngredients(selectedIngredients.filter(i => i !== ing))}>
+            <TouchableOpacity
+              onPress={() =>
+                setSelectedIngredients(
+                  selectedIngredients.filter((i) => i !== ing)
+                )
+              }
+            >
               <Text style={styles.remove}>X</Text>
             </TouchableOpacity>
           </View>
@@ -128,7 +155,9 @@ export default function FetchRecipes() {
       </View>
 
       <ScrollView
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         contentContainerStyle={styles.container}
       >
         {filteredRecipes.map((recipe) => {

@@ -1,5 +1,6 @@
+import { useTheme } from "@/src/hooks/useTheme";
 import AuthService from "@/src/services/auth.service";
-import { styles } from "@/src/styles/account.styles";
+import { createAccountStyles } from "@/src/styles/account.styles";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
@@ -9,6 +10,9 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [result, setResult] = useState<string | null>(null);
   const router = useRouter();
+
+  const theme = useTheme();
+  const styles = createAccountStyles(theme as any);
 
   const signIn = async () => {
     const res = await AuthService.signIn(email, password);

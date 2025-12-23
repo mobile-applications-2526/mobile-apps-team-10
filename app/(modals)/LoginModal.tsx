@@ -1,12 +1,15 @@
+import { useTheme } from "@/src/hooks/useTheme";
+import { createModalStyles } from "@/src/styles/modal.styles";
 import { router } from "expo-router";
 import { Text, TouchableOpacity, View } from "react-native";
-import { modalStyles as styles } from "@/src/styles/modal.styles";
 
 export default function LoginModal({
   setShowLoginModal,
 }: {
   setShowLoginModal: (show: boolean) => void;
 }) {
+  const theme = useTheme();
+  const styles = createModalStyles(theme as any);
   return (
     <View style={styles.overlay}>
       <View style={styles.box}>

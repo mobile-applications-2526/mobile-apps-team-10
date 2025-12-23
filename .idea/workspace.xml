@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="AutoImportSettings">
-    <option name="autoReloadType" value="SELECTIVE" />
+    <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="058aafc8-9673-4cc8-9b35-fc306c4d82ad" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/utils/pricing.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/recipes/_layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/recipes/_layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/recipes/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/recipes/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/ExpandableRecipe.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ExpandableRecipe.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/styles/expandable.styles.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/styles/expandable.styles.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/recipes.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/recipes.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,27 +23,42 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "RbbKmps"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;RbbKmps&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/mobile-applications-2526/mobile-apps-team-10",
-    "accountId": "9326d5fd-7415-4200-b963-723890f55421"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/mobile-applications-2526/mobile-apps-team-10&quot;,
+    &quot;accountId&quot;: &quot;9326d5fd-7415-4200-b963-723890f55421&quot;
   }
+}</component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 3
 }]]></component>
+  <component name="ProjectId" id="37Fqaor2pjoJFzQzRuaFL02rXST" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "git-widget-placeholder": "interactive-shoppinglist"
+    "git-widget-placeholder": "main"
   }
 }]]></component>
   <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="058aafc8-9673-4cc8-9b35-fc306c4d82ad" name="Changes" comment="" />
+      <created>1766509234929</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1766509234929</updated>
+    </task>
     <servers />
   </component>
   <component name="UnknownFeatures">

@@ -30,6 +30,7 @@ export default function FetchRecipes() {
   const [user, setUser] = useState<User | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [maxTime, setMaxTime] = useState<number | null>(null);
+  const [maxPrice, setMaxPrice] = useState<number | null>(null);
 
   const theme = useTheme();
   const styles = createRecipeStyles(theme as any);
@@ -76,8 +77,9 @@ export default function FetchRecipes() {
       selectedIngredients
     );
     result = RecipesService.filterByTime(result, maxTime);
+    result = RecipesService.filterByMaxPrice(result, maxPrice);
     setFilteredRecipes(result);
-  }, [selectedIngredients, maxTime, recipes]);
+  }, [selectedIngredients, maxTime, maxPrice, recipes]);
 
   const handleToggleFavorite = async (id: number) => {
     if (!user) {
@@ -136,6 +138,24 @@ export default function FetchRecipes() {
           }}
         />
       </View>
+
+      <View style={styles.filterSection}>
+        <TextInput
+          style={styles.input}
+          placeholder="Max price (€)"
+          keyboardType="numeric"
+          value={maxPrice?.toString() ?? ""}
+          onChangeText={(text) => {
+            if (text.trim() === "") {
+              setMaxPrice(null);
+              return;
+            }
+            const value = Number(text);
+            setMaxPrice(isNaN(value) ? null : value);
+          }}
+        />
+      </View>
+
 
       <View style={styles.selectedList}>
         {selectedIngredients.map((ing) => (

@@ -12,6 +12,30 @@ import {
 } from "react-native";
 import { createExpandableStyles } from "../styles/expandable.styles";
 
+/**
+ * Unit → pricing multiplier
+ * Assumption:
+ * - price_per_unit is per 100g OR per piece depending on ingredient
+ */
+const UNIT_MULTIPLIERS: Record<string, number> = {
+  // weight
+  g: 1 / 100,
+  grams: 1 / 100,
+
+  // volume (approximate, in grams)
+  tbsp: 1 / 16,
+  tsp: 1 / 5,
+
+  // pieces
+  pcs: 1,
+  whole: 1,
+  medium: 1,
+
+  // special culinary units
+  cloves: 0.05, // ~5g
+  leaves: 0.01, // ~1g
+};
+
 interface Props {
   recipe: Recipe;
   isFavorite?: boolean;
@@ -47,15 +71,14 @@ export default function ExpandableRecipe({
 
   const theme = useTheme();
   const styles = createExpandableStyles(theme as any);
+
   useEffect(() => {
     try {
       if (typeof localStorage !== "undefined") {
         const raw = localStorage.getItem(storageKey);
-        if (raw) {
-          setCheckedIds(JSON.parse(raw));
-        }
+        if (raw) setCheckedIds(JSON.parse(raw));
       }
-    } catch (err) {}
+    } catch {}
   }, [storageKey]);
 
   useEffect(() => {
@@ -63,24 +86,26 @@ export default function ExpandableRecipe({
       if (typeof localStorage !== "undefined") {
         localStorage.setItem(storageKey, JSON.stringify(checkedIds));
       }
-    } catch (err) {}
+    } catch {}
   }, [checkedIds, storageKey]);
 
   const toggleChecked = (ingredientId: number, e?: GestureResponderEvent) => {
     e?.stopPropagation();
-    setCheckedIds((prev) => {
-      if (prev.includes(ingredientId))
-        return prev.filter((id) => id !== ingredientId);
-      return [...prev, ingredientId];
-    });
+    setCheckedIds((prev) =>
+      prev.includes(ingredientId)
+        ? prev.filter((id) => id !== ingredientId)
+        : [...prev, ingredientId]
+    );
   };
 
   const toggleExpanded = () => setExpanded((s) => !s);
+
   const increase = (e?: GestureResponderEvent) => {
     e?.stopPropagation();
     setServings((s) => s + 1);
     setCheckedIds([]);
   };
+
   const decrease = (e?: GestureResponderEvent) => {
     e?.stopPropagation();
     setServings((s) => Math.max(1, s - 1));
@@ -97,6 +122,25 @@ export default function ExpandableRecipe({
     const rounded = Math.round(value * 100) / 100;
     return rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toString();
   };
+
+  /** ✅ Price calculation per ingredient (unit-aware) */
+  const calculateIngredientPrice = (ri: any) => {
+    const unit = ri.unit.toLowerCase();
+    const multiplier = UNIT_MULTIPLIERS[unit] ?? 1;
+    const scaledQuantity = ri.quantity * servings;
+
+    return ri.ingredients.price_per_unit * scaledQuantity * multiplier;
+  };
+
+  /** ✅ Total recipe price */
+  const calculateTotalPrice = () => {
+    return recipe.recipe_ingredients.reduce(
+      (total, ri) => total + calculateIngredientPrice(ri),
+      0
+    );
+  };
+
+  const formatPrice = (value: number) => `€${value.toFixed(2)}`;
 
   return (
     <TouchableOpacity
@@ -120,11 +164,16 @@ export default function ExpandableRecipe({
         </Text>
       ) : null}
 
-      {recipe.time_minutes !== null && recipe.time_minutes !== undefined ? (
+      {recipe.time_minutes !== null && (
         <Text style={[styles.time, timeStyle]}>
           ⏱ {recipe.time_minutes} min
         </Text>
-      ) : null}
+      )}
+
+      {/* ✅ Total price */}
+      <Text style={[styles.time, timeStyle]}>
+        💰 {formatPrice(calculateTotalPrice())}
+      </Text>
 
       {expanded && (
         <View style={styles.expandedSection}>
@@ -151,10 +200,14 @@ export default function ExpandableRecipe({
             </View>
           )}
 
-          <Text style={[styles.subheading, subheadingStyle]}>Ingredients:</Text>
-          {recipe.recipe_ingredients?.map((ri) => {
-            const scaled = (ri.quantity * servings) / 1;
+          <Text style={[styles.subheading, subheadingStyle]}>
+            Ingredients:
+          </Text>
+
+          {recipe.recipe_ingredients.map((ri) => {
+            const scaled = ri.quantity * servings;
             const checked = checkedIds.includes(ri.ingredient_id);
+
             return (
               <View key={ri.ingredient_id} style={styles.ingredientRow}>
                 <TouchableOpacity
@@ -167,27 +220,33 @@ export default function ExpandableRecipe({
                     color={checked ? "green" : "gray"}
                   />
                 </TouchableOpacity>
+
                 <TouchableOpacity
                   onPress={(e) => toggleChecked(ri.ingredient_id, e)}
                   style={{ flex: 1 }}
                 >
-                  <Text
-                    style={[
-                      styles.ingredientText,
-                      checked ? styles.ingredientChecked : null,
-                    ]}
-                  >
-                    {formatQuantity(scaled)} {ri.unit} {ri.ingredients.name}
-                  </Text>
+                  <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                    <Text
+                      style={[
+                        styles.ingredientText,
+                        checked ? styles.ingredientChecked : null,
+                      ]}
+                    >
+                      {formatQuantity(scaled)} {ri.unit} {ri.ingredients.name}
+                    </Text>
+
+                    <Text style={{ color: "#666", fontSize: 13 }}>
+                      €{calculateIngredientPrice(ri).toFixed(2)}
+                    </Text>
+                  </View>
                 </TouchableOpacity>
               </View>
             );
           })}
 
           <Text style={[styles.subheading, subheadingStyle]}>Steps:</Text>
-          {recipe.steps?.map((step, index) => (
+          {recipe.steps.map((step, index) => (
             <Text key={index} style={[styles.step, stepStyle]}>
-              {" "}
               {index + 1}. {step}
             </Text>
           ))}

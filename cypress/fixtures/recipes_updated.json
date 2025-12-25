@@ -1,0 +1,20 @@
+[
+  {
+    "id": 2,
+    "title": "Cucumber Salad",
+    "description": "Fresh salad",
+    "steps": ["Slice cucumber", "Mix"],
+    "recipe_ingredients": [
+      { "ingredient_id": 3, "quantity": "1", "unit": "pcs", "ingredients": { "name": "Cucumber" } }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Garlic Bread",
+    "description": "Toasted garlic bread",
+    "steps": ["Slice bread", "Toast with garlic"],
+    "recipe_ingredients": [
+      { "ingredient_id": 4, "quantity": "2", "unit": "slices", "ingredients": { "name": "Bread" } }
+    ]
+  }
+]

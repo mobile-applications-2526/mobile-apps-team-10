@@ -72,13 +72,14 @@ export default function FavoritesScreen() {
                 key={r.id}
                 style={styles.card}
                 onPress={() => toggleExpand(r.id)}
+                testID={`favorite-card-${r.id}`}
               >
                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                   <View style={{ flex: 1 }}>
-                    <Text style={styles.cardTitle}>{r.title}</Text>
+                    <Text testID={`recipe-title-${r.id}`} style={styles.cardTitle}>{r.title}</Text>
                     <Text style={styles.cardDescription}>{r.description}</Text>
                   </View>
-                  <TouchableOpacity style={{ padding: 10 }} onPress={(e) => { e.stopPropagation(); toggleFavorite(r.id); }}>
+                  <TouchableOpacity testID={`recipe-fav-button-${r.id}`} style={{ padding: 10 }} onPress={(e) => { e.stopPropagation(); toggleFavorite(r.id); }}>
                     <Ionicons name="heart" size={26} color="red" />
                   </TouchableOpacity>
                 </View>

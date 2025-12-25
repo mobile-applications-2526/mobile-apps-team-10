@@ -4,11 +4,15 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
+    "start:web": "expo start --web",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "test:e2e": "start-server-and-test start:web http://localhost:19006 cypress:run"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -44,8 +48,10 @@
   "devDependencies": {
     "@types/react": "~19.1.0",
     "@types/react-native-vector-icons": "^6.4.18",
+    "cypress": "^12.17.4",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
+    "start-server-and-test": "^1.14.0",
     "typescript": "~5.9.2"
   },
   "private": true

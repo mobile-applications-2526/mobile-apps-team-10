@@ -1,0 +1,21 @@
+[
+  {
+    "id": 1,
+    "title": "Tomato Soup",
+    "description": "A tasty tomato soup",
+    "steps": ["Chop tomatoes", "Boil", "Blend"],
+    "recipe_ingredients": [
+      { "ingredient_id": 1, "quantity": "2", "unit": "pcs", "ingredients": { "name": "Tomato" } },
+      { "ingredient_id": 2, "quantity": "1", "unit": "tsp", "ingredients": { "name": "Salt" } }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Cucumber Salad",
+    "description": "Fresh salad",
+    "steps": ["Slice cucumber", "Mix"],
+    "recipe_ingredients": [
+      { "ingredient_id": 3, "quantity": "1", "unit": "pcs", "ingredients": { "name": "Cucumber" } }
+    ]
+  }
+]

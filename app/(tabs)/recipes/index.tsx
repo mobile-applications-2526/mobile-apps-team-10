@@ -7,13 +7,13 @@ import { User } from "@supabase/supabase-js";
 import { Recipe } from "@types";
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  RefreshControl,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    RefreshControl,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import LoginModal from "../../(modals)/LoginModal";
 
@@ -32,11 +32,26 @@ export default function FetchRecipes() {
   useEffect(() => {
     const load = async () => {
       const { data } = await supabase.auth.getSession();
-      setUser(data.session?.user ?? null);
+      // E2E fallback
+      try {
+        // @ts-ignore
+        const win = typeof window !== 'undefined' ? (window as any) : undefined;
+        const e2eUser = win && win.__E2E_USER ? win.__E2E_USER : null;
+        setUser(data.session?.user ?? e2eUser ?? null);
+      } catch (e) {
+        setUser(data.session?.user ?? null);
+      }
     };
     load();
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      try {
+        // @ts-ignore
+        const win = typeof window !== 'undefined' ? (window as any) : undefined;
+        const e2eUser = win && win.__E2E_USER ? win.__E2E_USER : null;
+        setUser(session?.user ?? e2eUser ?? null);
+      } catch (e) {
+        setUser(session?.user ?? null);
+      }
     });
     return () => listener.subscription.unsubscribe();
   }, []);
@@ -85,12 +100,13 @@ export default function FetchRecipes() {
           placeholder="Enter ingredient..."
           value={filterText}
           onChangeText={setFilterText}
+          testID="filter-input"
         />
         <TouchableOpacity style={styles.addButton} onPress={() => {
           const ing = filterText.trim().toLowerCase();
           if (ing && !selectedIngredients.includes(ing)) setSelectedIngredients([...selectedIngredients, ing]);
           setFilterText("");
-        }}>
+        }} testID="filter-add">
           <Text style={styles.addButtonText}>Add</Text>
         </TouchableOpacity>
       </View>
@@ -118,8 +134,8 @@ export default function FetchRecipes() {
               setExpandedIds(prev => prev.includes(recipe.id) ? prev.filter(i => i !== recipe.id) : [...prev, recipe.id]);
             }}>
               <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                <Text style={styles.title}>{recipe.title}</Text>
-                <TouchableOpacity onPress={(e) => { e.stopPropagation(); handleToggleFavorite(recipe.id); }}>
+                <Text testID={`recipe-title-${recipe.id}`} style={styles.title}>{recipe.title}</Text>
+                <TouchableOpacity testID={`recipe-fav-button-${recipe.id}`} onPress={(e) => { e.stopPropagation(); handleToggleFavorite(recipe.id); }}>
                   <Ionicons name={isFav ? "heart" : "heart-outline"} size={24} color={isFav ? "red" : "black"} />
                 </TouchableOpacity>
               </View>
@@ -127,9 +143,11 @@ export default function FetchRecipes() {
               {isExpanded && (
                 <>
                   <Text style={styles.subheading}>Ingredients:</Text>
+                  <View testID={`recipe-ingredients-${recipe.id}`}>
                   {recipe.recipe_ingredients.map((ri) => (
                     <Text key={ri.ingredient_id} style={styles.ingredient}>{ri.quantity} {ri.unit} {ri.ingredients.name}</Text>
                   ))}
+                  </View>
                   <Text style={styles.subheading}>Steps:</Text>
                   {recipe.steps.map((step, index) => <Text key={index} style={styles.step}>{index + 1}. {step}</Text>)}
                 </>

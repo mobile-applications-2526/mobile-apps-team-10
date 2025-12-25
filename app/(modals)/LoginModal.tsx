@@ -27,7 +27,7 @@ export default function LoginModal({
           width: "80%",
         }}
       >
-        <Text style={{ fontSize: 18, marginBottom: 10 }}>
+        <Text testID="login-modal" style={{ fontSize: 18, marginBottom: 10 }}>
           You need to be logged in to favorite recipes.
         </Text>
 
@@ -43,11 +43,12 @@ export default function LoginModal({
             borderRadius: 8,
             marginBottom: 10,
           }}
+          testID="login-modal-login"
         >
           <Text style={{ color: "white", textAlign: "center" }}>Log in</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => setShowLoginModal(false)}>
+        <TouchableOpacity onPress={() => setShowLoginModal(false)} testID="login-modal-close">
           <Text style={{ textAlign: "center" }}>Close</Text>
         </TouchableOpacity>
       </View>

@@ -43,11 +43,15 @@ interface Props {
   showServingsControls?: boolean;
   containerStyle?: ViewStyle | ViewStyle[];
   titleStyle?: TextStyle;
+  /** testID to apply to the title Text element (useful for E2E) */
+  titleTestID?: string;
   descriptionStyle?: TextStyle;
   timeStyle?: TextStyle;
   subheadingStyle?: TextStyle;
   ingredientStyle?: TextStyle;
   stepStyle?: TextStyle;
+  /** testID to apply to the favorite toggle button */
+  favoriteTestID?: string;
 }
 
 export default function ExpandableRecipe({
@@ -57,11 +61,15 @@ export default function ExpandableRecipe({
   showServingsControls = true,
   containerStyle,
   titleStyle,
+  /** optional testID applied to title text */
+  titleTestID,
   descriptionStyle,
   timeStyle,
   subheadingStyle,
   ingredientStyle,
   stepStyle,
+  /** optional testID applied to favorite button */
+  favoriteTestID,
 }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [servings, setServings] = useState<number>(1);
@@ -148,8 +156,8 @@ export default function ExpandableRecipe({
       onPress={toggleExpanded}
     >
       <View style={styles.rowBetween}>
-        <Text style={[styles.title, titleStyle]}>{recipe.title}</Text>
-        <TouchableOpacity onPress={handleToggleFavorite}>
+        <Text testID={titleTestID} style={[styles.title, titleStyle]}>{recipe.title}</Text>
+        <TouchableOpacity testID={favoriteTestID} onPress={handleToggleFavorite}>
           <Ionicons
             name={isFavorite ? "heart" : "heart-outline"}
             size={24}

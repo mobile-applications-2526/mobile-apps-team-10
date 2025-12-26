@@ -43,11 +43,19 @@ interface Props {
   showServingsControls?: boolean;
   containerStyle?: ViewStyle | ViewStyle[];
   titleStyle?: TextStyle;
+  /** testID to apply to the title Text element (useful for E2E) */
+  titleTestID?: string;
   descriptionStyle?: TextStyle;
   timeStyle?: TextStyle;
   subheadingStyle?: TextStyle;
   ingredientStyle?: TextStyle;
   stepStyle?: TextStyle;
+  /** testID to apply to the favorite toggle button */
+  favoriteTestID?: string;
+  /** testID to apply to the ingredients container when expanded */
+  ingredientsTestID?: string;
+  /** testID applied to the top-level touchable wrapper */
+  wrapperTestID?: string;
 }
 
 export default function ExpandableRecipe({
@@ -57,11 +65,19 @@ export default function ExpandableRecipe({
   showServingsControls = true,
   containerStyle,
   titleStyle,
+  /** optional testID applied to title text */
+  titleTestID,
   descriptionStyle,
   timeStyle,
   subheadingStyle,
   ingredientStyle,
   stepStyle,
+  /** optional testID applied to favorite button */
+  favoriteTestID,
+  /** testID for ingredients container when expanded */
+  ingredientsTestID,
+  /** testID applied to the top-level wrapper */
+  wrapperTestID,
 }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [servings, setServings] = useState<number>(1);
@@ -146,10 +162,11 @@ export default function ExpandableRecipe({
     <TouchableOpacity
       style={[styles.card, containerStyle]}
       onPress={toggleExpanded}
+      testID={wrapperTestID}
     >
       <View style={styles.rowBetween}>
-        <Text style={[styles.title, titleStyle]}>{recipe.title}</Text>
-        <TouchableOpacity onPress={handleToggleFavorite}>
+        <Text testID={titleTestID} style={[styles.title, titleStyle]}>{recipe.title}</Text>
+        <TouchableOpacity testID={favoriteTestID} onPress={handleToggleFavorite}>
           <Ionicons
             name={isFavorite ? "heart" : "heart-outline"}
             size={24}
@@ -204,6 +221,7 @@ export default function ExpandableRecipe({
             Ingredients:
           </Text>
 
+          <View testID={ingredientsTestID}>
           {recipe.recipe_ingredients.map((ri) => {
             const scaled = ri.quantity * servings;
             const checked = checkedIds.includes(ri.ingredient_id);
@@ -243,6 +261,7 @@ export default function ExpandableRecipe({
               </View>
             );
           })}
+          </View>
 
           <Text style={[styles.subheading, subheadingStyle]}>Steps:</Text>
           {recipe.steps.map((step, index) => (

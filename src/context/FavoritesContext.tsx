@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
 import FavoritesService from '@/src/services/favorites.service';
 import { supabase } from '@/src/supabase/supabase';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface FavoritesContextType {
   favorites: number[];
@@ -15,9 +15,27 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+    supabase.auth.getUser().then(({ data }) => {
+      // fallback to E2E user for tests
+      try {
+        // @ts-ignore
+        const win = typeof window !== 'undefined' ? (window as any) : undefined;
+        const e2eId = win && win.__E2E_USER?.id;
+        setUserId(data.user?.id ?? e2eId ?? null);
+      } catch (e) {
+        setUserId(data.user?.id ?? null);
+      }
+    });
+
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUserId(session?.user?.id ?? null);
+      try {
+        // @ts-ignore
+        const win = typeof window !== 'undefined' ? (window as any) : undefined;
+        const e2eId = win && win.__E2E_USER?.id;
+        setUserId(session?.user?.id ?? e2eId ?? null);
+      } catch (e) {
+        setUserId(session?.user?.id ?? null);
+      }
     });
     return () => listener.subscription.unsubscribe();
   }, []);

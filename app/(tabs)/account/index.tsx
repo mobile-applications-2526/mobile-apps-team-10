@@ -1,11 +1,11 @@
+import { useTheme } from "@/src/hooks/useTheme";
 import AuthService from "@/src/services/auth.service";
 import SessionService from "@/src/services/session.service";
+import { createAccountStyles } from "@/src/styles/account.styles";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import LoginScreen from "./login";
-import { createAccountStyles } from "@/src/styles/account.styles";
-import { useTheme } from "@/src/hooks/useTheme";
 
 export default function AccountIndex() {
   const [user, setUser] = useState<any | null>(null);
@@ -21,7 +21,14 @@ export default function AccountIndex() {
     const init = async () => {
       const { data } = await SessionService.getSession();
       if (!mounted) return;
-      setUser(data.session?.user ?? null);
+      try {
+        // @ts-ignore
+        const win = typeof window !== 'undefined' ? (window as any) : undefined;
+        const e2eUser = win && win.__E2E_USER ? win.__E2E_USER : null;
+        setUser(data.session?.user ?? e2eUser ?? null);
+      } catch (e) {
+        setUser(data.session?.user ?? null);
+      }
       setLoading(false);
     };
 
@@ -30,8 +37,15 @@ export default function AccountIndex() {
     const { data: listener } = SessionService.onAuthStateChange(
       (_event, session) => {
         if (!mounted) return;
+        try {
+        // @ts-ignore
+        const win = typeof window !== 'undefined' ? (window as any) : undefined;
+        const e2eUser = win && win.__E2E_USER ? win.__E2E_USER : null;
+        setUser(session?.user ?? e2eUser ?? null);
+      } catch (e) {
         setUser(session?.user ?? null);
-      }
+        }
+    }
     );
 
     return () => {
@@ -43,7 +57,7 @@ export default function AccountIndex() {
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Account</Text>
+        <Text testID="account-title" style={styles.title}>Account</Text>
         <Text>Loading…</Text>
       </View>
     );
@@ -55,7 +69,7 @@ export default function AccountIndex() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Account</Text>
+      <Text testID="account-title" style={styles.title}>Account</Text>
       <Text style={{ marginBottom: 12 }}>{user.email}</Text>
       <TouchableOpacity
         onPress={async () => {

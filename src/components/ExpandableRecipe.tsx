@@ -52,6 +52,10 @@ interface Props {
   stepStyle?: TextStyle;
   /** testID to apply to the favorite toggle button */
   favoriteTestID?: string;
+  /** testID to apply to the ingredients container when expanded */
+  ingredientsTestID?: string;
+  /** testID applied to the top-level touchable wrapper */
+  wrapperTestID?: string;
 }
 
 export default function ExpandableRecipe({
@@ -70,6 +74,10 @@ export default function ExpandableRecipe({
   stepStyle,
   /** optional testID applied to favorite button */
   favoriteTestID,
+  /** testID for ingredients container when expanded */
+  ingredientsTestID,
+  /** testID applied to the top-level wrapper */
+  wrapperTestID,
 }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [servings, setServings] = useState<number>(1);
@@ -154,6 +162,7 @@ export default function ExpandableRecipe({
     <TouchableOpacity
       style={[styles.card, containerStyle]}
       onPress={toggleExpanded}
+      testID={wrapperTestID}
     >
       <View style={styles.rowBetween}>
         <Text testID={titleTestID} style={[styles.title, titleStyle]}>{recipe.title}</Text>
@@ -212,6 +221,7 @@ export default function ExpandableRecipe({
             Ingredients:
           </Text>
 
+          <View testID={ingredientsTestID}>
           {recipe.recipe_ingredients.map((ri) => {
             const scaled = ri.quantity * servings;
             const checked = checkedIds.includes(ri.ingredient_id);
@@ -251,6 +261,7 @@ export default function ExpandableRecipe({
               </View>
             );
           })}
+          </View>
 
           <Text style={[styles.subheading, subheadingStyle]}>Steps:</Text>
           {recipe.steps.map((step, index) => (

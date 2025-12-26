@@ -8,13 +8,13 @@ import { User } from "@supabase/supabase-js";
 import { Recipe } from "@types";
 import { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    RefreshControl,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import LoginModal from "../../(modals)/LoginModal";
 
@@ -206,6 +206,8 @@ export default function FetchRecipes() {
               onToggleFavorite={(id) => handleToggleFavorite(id)}
               showServingsControls={true}
               containerStyle={styles.recipeCard}
+              titleTestID={`recipe-title-${recipe.id}`}
+              favoriteTestID={`recipe-fav-button-${recipe.id}`}              wrapperTestID={`recipe-wrapper-${recipe.id}`}              ingredientsTestID={`recipe-ingredients-${recipe.id}`}
             />
           );
         })}

@@ -86,6 +86,8 @@ export default function FavoritesScreen() {
               containerStyle={styles.card}
               titleTestID={`recipe-title-${r.id}`}
               favoriteTestID={`recipe-fav-button-${r.id}`}
+              wrapperTestID={`recipe-wrapper-${r.id}`}
+              ingredientsTestID={`recipe-ingredients-${r.id}`}
             />
           ))}
         </ScrollView>

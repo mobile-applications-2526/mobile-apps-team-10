@@ -17,8 +17,8 @@ describe('Recipes list and filtering', () => {
     cy.get('[data-testid="recipe-title-1"]').should('exist');
     cy.get('[data-testid="recipe-title-2"]').should('not.exist');
 
-    // Expand card and check ingredients
-    cy.get('[data-testid="recipe-title-1"]').click();
+    // Expand card and check ingredients (click wrapper to reliably trigger expand)
+    cy.get('[data-testid="recipe-wrapper-1"]').click();
     cy.get('[data-testid="recipe-ingredients-1"]').should('contain.text', 'Tomato');
   });
 });

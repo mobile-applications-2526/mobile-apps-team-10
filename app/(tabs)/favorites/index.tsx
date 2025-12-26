@@ -1,13 +1,20 @@
+import ExpandableRecipe from "@/src/components/ExpandableRecipe";
 import { useFavorites } from "@/src/context/FavoritesContext";
+import { useTheme } from "@/src/hooks/useTheme";
 import RecipesService from "@/src/services/recipes.service";
-import { favoritesStyles as styles } from "@/src/styles/favorites.styles"; // Note: you might need to add expanded styles here or use recipes.styles
-import { supabase } from "@/src/supabase/supabase";
-import { Ionicons } from "@expo/vector-icons";
+import SessionService from "@/src/services/session.service";
+import { createFavoriteStyles } from "@/src/styles/favorites.styles";
 import { User } from "@supabase/supabase-js";
 import { Recipe } from "@types";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import LoginModal from "../../(modals)/LoginModal";
 
@@ -19,11 +26,14 @@ export default function FavoritesScreen() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  const [expandedIds, setExpandedIds] = useState<number[]>([]);
+  const theme = useTheme();
+  const styles = createFavoriteStyles(theme as any);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null));
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => setUser(session?.user ?? null));
+    SessionService.getUser().then(({ data }) => setUser(data.user ?? null));
+    const { data: listener } = SessionService.onAuthStateChange(
+      (_event, session) => setUser(session?.user ?? null)
+    );
     return () => listener.subscription.unsubscribe();
   }, []);
 
@@ -35,7 +45,9 @@ export default function FavoritesScreen() {
   useFocusEffect(
     useCallback(() => {
       setLoading(true);
-      Promise.all([loadAll(), refreshFavorites()]).finally(() => setLoading(false));
+      Promise.all([loadAll(), refreshFavorites()]).finally(() =>
+        setLoading(false)
+      );
     }, [user])
   );
 
@@ -45,24 +57,22 @@ export default function FavoritesScreen() {
     setRefreshing(false);
   };
 
-  const toggleExpand = (id: number) => {
-    setExpandedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
-  };
-
   const favoriteRecipes = allRecipes.filter((r) => favorites.includes(r.id));
 
   return (
     <SafeAreaView style={styles.screen}>
       <Text style={styles.title}>Your Favorites</Text>
       {loading && !refreshing ? (
-        <View style={styles.loadingContainer}><ActivityIndicator color="tomato" /></View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator color="tomato" />
+        </View>
       ) : favoriteRecipes.length === 0 ? (
         <Text style={styles.emptyText}>No favorites yet.</Text>
       ) : (
         <ScrollView
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
           style={styles.listWrapper}
         >
           {favoriteRecipes.map((r) => {
@@ -104,6 +114,16 @@ export default function FavoritesScreen() {
               </TouchableOpacity>
             );
           })}
+          {favoriteRecipes.map((r) => (
+            <ExpandableRecipe
+              key={r.id}
+              recipe={r}
+              isFavorite={true}
+              onToggleFavorite={() => toggleFavorite(r.id)}
+              showServingsControls={true}
+              containerStyle={styles.card}
+            />
+          ))}
         </ScrollView>
       )}
       {showLoginModal && <LoginModal setShowLoginModal={setShowLoginModal} />}

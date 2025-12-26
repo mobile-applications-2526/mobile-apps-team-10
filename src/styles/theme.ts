@@ -1,17 +1,6 @@
 import { TextStyle } from "react-native";
 
-export const theme = {
-  colors: {
-    background: "#ffffff",
-    primary: "#2196f3",
-    accent: "tomato",
-    muted: "#f7f7f7",
-    border: "#cccccc",
-    text: "#000000",
-    placeholder: "#aaaaaa",
-    danger: "red",
-    white: "#ffffff",
-  },
+const theme = {
   spacing: {
     xs: 6,
     sm: 8,
@@ -38,6 +27,38 @@ export const theme = {
     bold: "700" as TextStyle["fontWeight"],
     extra: "800" as TextStyle["fontWeight"],
   },
-} as const;
+};
 
-export default theme;
+export const lightTheme = {
+  ...theme,
+  colors: {
+    background: "#ffffff",
+    primary: "#2196f3",
+    accent: "tomato",
+    muted: "#f7f7f7",
+    border: "#cccccc",
+    text: "#000000",
+    placeholder: "#aaaaaa",
+    danger: "red",
+    white: "#ffffff",
+    modalBackground: "rgba(0,0,0,0.3)",
+  },
+};
+
+export const darkTheme = {
+  ...theme,
+  colors: {
+    background: "#000000",
+    primary: "#90caf9",
+    accent: "tomato",
+    muted: "#1c1c1e",
+    border: "#2c2c2e",
+    text: "#ffffff",
+    placeholder: "#888888",
+    danger: "#ff6b6b",
+    white: "#ffffff",
+    modalBackground: "rgba(255,255,255,0.2)",
+  },
+};
+
+export type Theme = typeof lightTheme;

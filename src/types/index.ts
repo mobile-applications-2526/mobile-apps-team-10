@@ -1,8 +1,14 @@
 export type Ingredient = {
+id: number;
+name: string;
+price_per_unit: number;
+};
+
+export type RecipeIngredient = {
   ingredient_id: number;
   quantity: number;
   unit: string;
-  ingredients: { name: string };
+  ingredients: Ingredient;
 };
 
 export type Recipe = {
@@ -10,5 +16,6 @@ export type Recipe = {
   title: string;
   description: string;
   steps: string[];
-  recipe_ingredients: Ingredient[];
+  time_minutes: number | null;
+  recipe_ingredients: RecipeIngredient[];
 };

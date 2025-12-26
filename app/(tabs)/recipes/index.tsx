@@ -1,8 +1,9 @@
-import { useFavorites } from "@/src/context/FavoritesContext"; // Import the hook
+import ExpandableRecipe from "@/src/components/ExpandableRecipe";
+import { useFavorites } from "@/src/context/FavoritesContext";
+import { useTheme } from "@/src/hooks/useTheme";
 import RecipesService from "@/src/services/recipes.service";
-import { styles } from "@/src/styles/recipes.styles";
-import { supabase } from "@/src/supabase/supabase";
-import { Ionicons } from "@expo/vector-icons";
+import SessionService from "@/src/services/session.service";
+import { createRecipeStyles } from "@/src/styles/recipes.styles";
 import { User } from "@supabase/supabase-js";
 import { Recipe } from "@types";
 import { useEffect, useState } from "react";
@@ -18,7 +19,7 @@ import {
 import LoginModal from "../../(modals)/LoginModal";
 
 export default function FetchRecipes() {
-  const { favorites, toggleFavorite, refreshFavorites } = useFavorites(); // Use global context
+  const { favorites, toggleFavorite, refreshFavorites } = useFavorites();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedIds, setExpandedIds] = useState<number[]>([]);
@@ -28,10 +29,15 @@ export default function FetchRecipes() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [maxTime, setMaxTime] = useState<number | null>(null);
+  const [maxPrice, setMaxPrice] = useState<number | null>(null);
+
+  const theme = useTheme();
+  const styles = createRecipeStyles(theme as any);
 
   useEffect(() => {
     const load = async () => {
-      const { data } = await supabase.auth.getSession();
+      const { data } = await SessionService.getSession();
       // E2E fallback
       try {
         // @ts-ignore
@@ -43,16 +49,18 @@ export default function FetchRecipes() {
       }
     };
     load();
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      try {
+    const { data: listener } = SessionService.onAuthStateChange(
+      (_event, session) => {
+        try {
         // @ts-ignore
         const win = typeof window !== 'undefined' ? (window as any) : undefined;
         const e2eUser = win && win.__E2E_USER ? win.__E2E_USER : null;
         setUser(session?.user ?? e2eUser ?? null);
       } catch (e) {
         setUser(session?.user ?? null);
-      }
-    });
+        }
+    }
+    );
     return () => listener.subscription.unsubscribe();
   }, []);
 
@@ -66,7 +74,9 @@ export default function FetchRecipes() {
     try {
       const data = await RecipesService.fetchAll();
       setRecipes(data);
-      setFilteredRecipes(RecipesService.filterByIngredients(data, selectedIngredients));
+      setFilteredRecipes(
+        RecipesService.filterByIngredients(data, selectedIngredients)
+      );
     } catch (err) {
       console.log("Failed to load recipes", err);
     }
@@ -77,8 +87,14 @@ export default function FetchRecipes() {
   }, []);
 
   useEffect(() => {
-    setFilteredRecipes(RecipesService.filterByIngredients(recipes, selectedIngredients));
-  }, [selectedIngredients, recipes]);
+    let result = RecipesService.filterByIngredients(
+      recipes,
+      selectedIngredients
+    );
+    result = RecipesService.filterByTime(result, maxTime);
+    result = RecipesService.filterByMaxPrice(result, maxPrice);
+    setFilteredRecipes(result);
+  }, [selectedIngredients, maxTime, maxPrice, recipes]);
 
   const handleToggleFavorite = async (id: number) => {
     if (!user) {
@@ -88,11 +104,18 @@ export default function FetchRecipes() {
     await toggleFavorite(id);
   };
 
-  if (loading) return <View style={styles.loadingContainer}><ActivityIndicator /></View>;
+  if (loading)
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator />
+      </View>
+    );
 
   return (
     <View style={styles.screen}>
-      <View style={styles.header}><Text style={styles.pageTitle}>Recipes</Text></View>
+      <View style={styles.header}>
+        <Text style={styles.pageTitle}>Recipes</Text>
+      </View>
 
       <View style={styles.filterSection}>
         <TextInput
@@ -102,20 +125,65 @@ export default function FetchRecipes() {
           onChangeText={setFilterText}
           testID="filter-input"
         />
-        <TouchableOpacity style={styles.addButton} onPress={() => {
-          const ing = filterText.trim().toLowerCase();
-          if (ing && !selectedIngredients.includes(ing)) setSelectedIngredients([...selectedIngredients, ing]);
-          setFilterText("");
-        }} testID="filter-add">
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => {
+            const ing = filterText.trim().toLowerCase();
+            if (ing && !selectedIngredients.includes(ing))
+              setSelectedIngredients([...selectedIngredients, ing]);
+            setFilterText("");
+          }}
+         testID="filter-add">
           <Text style={styles.addButtonText}>Add</Text>
         </TouchableOpacity>
       </View>
+
+      <View style={styles.filterSection}>
+        <TextInput
+          style={styles.input}
+          placeholder="Max time (minutes)"
+          keyboardType="numeric"
+          value={maxTime?.toString() ?? ""}
+          onChangeText={(text) => {
+            if (text.trim() === "") {
+              setMaxTime(null);
+              return;
+            }
+            const value = Number(text);
+            setMaxTime(isNaN(value) ? null : value);
+          }}
+        />
+      </View>
+
+      <View style={styles.filterSection}>
+        <TextInput
+          style={styles.input}
+          placeholder="Max price (€)"
+          keyboardType="numeric"
+          value={maxPrice?.toString() ?? ""}
+          onChangeText={(text) => {
+            if (text.trim() === "") {
+              setMaxPrice(null);
+              return;
+            }
+            const value = Number(text);
+            setMaxPrice(isNaN(value) ? null : value);
+          }}
+        />
+      </View>
+
 
       <View style={styles.selectedList}>
         {selectedIngredients.map((ing) => (
           <View key={ing} style={styles.selectedItem}>
             <Text>{ing}</Text>
-            <TouchableOpacity onPress={() => setSelectedIngredients(selectedIngredients.filter(i => i !== ing))}>
+            <TouchableOpacity
+              onPress={() =>
+                setSelectedIngredients(
+                  selectedIngredients.filter((i) => i !== ing)
+                )
+              }
+            >
               <Text style={styles.remove}>X</Text>
             </TouchableOpacity>
           </View>
@@ -123,36 +191,22 @@ export default function FetchRecipes() {
       </View>
 
       <ScrollView
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         contentContainerStyle={styles.container}
       >
         {filteredRecipes.map((recipe) => {
           const isExpanded = expandedIds.includes(recipe.id);
-          const isFav = favorites.includes(recipe.id);
           return (
-            <TouchableOpacity key={recipe.id} style={styles.recipeCard} onPress={() => {
-              setExpandedIds(prev => prev.includes(recipe.id) ? prev.filter(i => i !== recipe.id) : [...prev, recipe.id]);
-            }}>
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                <Text testID={`recipe-title-${recipe.id}`} style={styles.title}>{recipe.title}</Text>
-                <TouchableOpacity testID={`recipe-fav-button-${recipe.id}`} onPress={(e) => { e.stopPropagation(); handleToggleFavorite(recipe.id); }}>
-                  <Ionicons name={isFav ? "heart" : "heart-outline"} size={24} color={isFav ? "red" : "black"} />
-                </TouchableOpacity>
-              </View>
-              <Text style={styles.description}>{recipe.description}</Text>
-              {isExpanded && (
-                <>
-                  <Text style={styles.subheading}>Ingredients:</Text>
-                  <View testID={`recipe-ingredients-${recipe.id}`}>
-                  {recipe.recipe_ingredients.map((ri) => (
-                    <Text key={ri.ingredient_id} style={styles.ingredient}>{ri.quantity} {ri.unit} {ri.ingredients.name}</Text>
-                  ))}
-                  </View>
-                  <Text style={styles.subheading}>Steps:</Text>
-                  {recipe.steps.map((step, index) => <Text key={index} style={styles.step}>{index + 1}. {step}</Text>)}
-                </>
-              )}
-            </TouchableOpacity>
+            <ExpandableRecipe
+              key={recipe.id}
+              recipe={recipe}
+              isFavorite={favorites.includes(recipe.id)}
+              onToggleFavorite={(id) => handleToggleFavorite(id)}
+              showServingsControls={true}
+              containerStyle={styles.recipeCard}
+            />
           );
         })}
       </ScrollView>

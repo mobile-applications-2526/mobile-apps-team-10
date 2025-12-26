@@ -1,5 +1,6 @@
+import { useTheme } from "@/src/hooks/useTheme";
 import AuthService from "@/src/services/auth.service";
-import { styles } from "@/src/styles/account.styles";
+import { createAccountStyles } from "@/src/styles/account.styles";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
@@ -9,6 +10,9 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [result, setResult] = useState<string | null>(null);
   const router = useRouter();
+
+  const theme = useTheme();
+  const styles = createAccountStyles(theme as any);
 
   const signIn = async () => {
     // E2E helper: when running Cypress with ?e2e_login_success=1 we skip real auth
@@ -65,10 +69,10 @@ export default function LoginScreen() {
       {result && <Text testID="login-result" style={styles.result}>{result}</Text>}
       <TouchableOpacity
         onPress={() => router.push("/(tabs)/account/signup")}
-        style={{ marginTop: 12 }}
+        style={styles.linkSpacing}
         activeOpacity={0.7}
       >
-        <Text style={{ color: "blue" }}>Don't have an account? Create one</Text>
+        <Text style={styles.linkText}>Don't have an account? Create one</Text>
       </TouchableOpacity>
     </View>
   );

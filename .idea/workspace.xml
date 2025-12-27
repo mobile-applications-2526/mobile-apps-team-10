@@ -5,12 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="058aafc8-9673-4cc8-9b35-fc306c4d82ad" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/utils/pricing.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/recipes/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/recipes/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/ExpandableRecipe.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ExpandableRecipe.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/recipes.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/recipes.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/types/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/styles/recipes.styles.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/styles/recipes.styles.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,9 +33,9 @@
     &quot;accountId&quot;: &quot;9326d5fd-7415-4200-b963-723890f55421&quot;
   }
 }</component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 3
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="37Fqaor2pjoJFzQzRuaFL02rXST" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -48,7 +46,14 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "git-widget-placeholder": "main"
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "filters-accordeon"
   }
 }]]></component>
   <component name="TaskManager">
@@ -63,5 +68,13 @@
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.ts" />
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
   </component>
 </project>

@@ -118,17 +118,6 @@ export const createRecipeStyles = (theme: Theme) =>
       color: theme.colors.danger,
       fontWeight: theme.fontWeights.bold,
     },
-    filterButton: {
-      backgroundColor: theme.colors.primary,
-      paddingVertical: 8,
-      paddingHorizontal: 12,
-      borderRadius: theme.radii.md,
-      marginLeft: 5,
-    },
-    filterButtonText: {
-      color: theme.colors.white,
-      fontWeight: theme.fontWeights.bold,
-    },
     loadingContainer: {
       marginTop: theme.spacing.xl,
       alignItems: "center",

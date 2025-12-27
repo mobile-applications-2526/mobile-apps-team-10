@@ -31,6 +31,7 @@ export default function FetchRecipes() {
   const [refreshing, setRefreshing] = useState(false);
   const [maxTime, setMaxTime] = useState<number | null>(null);
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
 
   const theme = useTheme();
   const styles = createRecipeStyles(theme as any);
@@ -139,39 +140,54 @@ export default function FetchRecipes() {
       </View>
 
       <View style={styles.filterSection}>
-        <TextInput
-          style={styles.input}
-          placeholder="Max time (minutes)"
-          keyboardType="numeric"
-          value={maxTime?.toString() ?? ""}
-          onChangeText={(text) => {
-            if (text.trim() === "") {
-              setMaxTime(null);
-              return;
-            }
-            const value = Number(text);
-            setMaxTime(isNaN(value) ? null : value);
-          }}
-        />
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => setShowFilters((s) => !s)}
+          testID="advanced-filters-toggle"
+        >
+        <Text style={styles.addButtonText}>
+          {`Show filters ${showFilters ? '−' : '+'}`}
+        </Text>
+        </TouchableOpacity>
       </View>
 
-      <View style={styles.filterSection}>
-        <TextInput
-          style={styles.input}
-          placeholder="Max price (€)"
-          keyboardType="numeric"
-          value={maxPrice?.toString() ?? ""}
-          onChangeText={(text) => {
-            if (text.trim() === "") {
-              setMaxPrice(null);
-              return;
-            }
-            const value = Number(text);
-            setMaxPrice(isNaN(value) ? null : value);
-          }}
-        />
-      </View>
+      {showFilters && (
+        <>
+          <View style={styles.filterSection}>
+            <TextInput
+              style={styles.input}
+              placeholder="Max time (minutes)"
+              keyboardType="numeric"
+              value={maxTime?.toString() ?? ""}
+              onChangeText={(text) => {
+                if (text.trim() === "") {
+                  setMaxTime(null);
+                  return;
+                }
+                const value = Number(text);
+                setMaxTime(isNaN(value) ? null : value);
+              }}
+            />
+           </View>
 
+           <View style={styles.filterSection}>
+             <TextInput
+               style={styles.input}
+               placeholder="Max price (€)"
+               keyboardType="numeric"
+               value={maxPrice?.toString() ?? ""}
+               onChangeText={(text) => {
+                 if (text.trim() === "") {
+                   setMaxPrice(null);
+                   return;
+                 }
+                 const value = Number(text);
+                 setMaxPrice(isNaN(value) ? null : value);
+               }}
+             />
+           </View>
+         </>
+       )}
 
       <View style={styles.selectedList}>
         {selectedIngredients.map((ing) => (
@@ -207,7 +223,9 @@ export default function FetchRecipes() {
               showServingsControls={true}
               containerStyle={styles.recipeCard}
               titleTestID={`recipe-title-${recipe.id}`}
-              favoriteTestID={`recipe-fav-button-${recipe.id}`}              wrapperTestID={`recipe-wrapper-${recipe.id}`}              ingredientsTestID={`recipe-ingredients-${recipe.id}`}
+              favoriteTestID={`recipe-fav-button-${recipe.id}`}
+              wrapperTestID={`recipe-wrapper-${recipe.id}`}
+              ingredientsTestID={`recipe-ingredients-${recipe.id}`}
             />
           );
         })}

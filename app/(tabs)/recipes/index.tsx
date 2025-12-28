@@ -30,6 +30,8 @@ export default function FetchRecipes() {
   const [user, setUser] = useState<User | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [maxTime, setMaxTime] = useState<number | null>(null);
+  const [maxPrice, setMaxPrice] = useState<number | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
 
   const theme = useTheme();
   const styles = createRecipeStyles(theme as any);
@@ -37,12 +39,28 @@ export default function FetchRecipes() {
   useEffect(() => {
     const load = async () => {
       const { data } = await SessionService.getSession();
-      setUser(data.session?.user ?? null);
+      // E2E fallback
+      try {
+        // @ts-ignore
+        const win = typeof window !== "undefined" ? (window as any) : undefined;
+        const e2eUser = win && win.__E2E_USER ? win.__E2E_USER : null;
+        setUser(data.session?.user ?? e2eUser ?? null);
+      } catch (e) {
+        setUser(data.session?.user ?? null);
+      }
     };
     load();
     const { data: listener } = SessionService.onAuthStateChange(
       (_event, session) => {
-        setUser(session?.user ?? null);
+        try {
+          // @ts-ignore
+          const win =
+            typeof window !== "undefined" ? (window as any) : undefined;
+          const e2eUser = win && win.__E2E_USER ? win.__E2E_USER : null;
+          setUser(session?.user ?? e2eUser ?? null);
+        } catch (e) {
+          setUser(session?.user ?? null);
+        }
       }
     );
     return () => listener.subscription.unsubscribe();
@@ -76,8 +94,9 @@ export default function FetchRecipes() {
       selectedIngredients
     );
     result = RecipesService.filterByTime(result, maxTime);
+    result = RecipesService.filterByMaxPrice(result, maxPrice);
     setFilteredRecipes(result);
-  }, [selectedIngredients, maxTime, recipes]);
+  }, [selectedIngredients, maxTime, maxPrice, recipes]);
 
   const handleToggleFavorite = async (id: number) => {
     if (!user) {
@@ -106,6 +125,7 @@ export default function FetchRecipes() {
           placeholder="Enter ingredient..."
           value={filterText}
           onChangeText={setFilterText}
+          testID="filter-input"
         />
         <TouchableOpacity
           style={styles.addButton}
@@ -115,27 +135,61 @@ export default function FetchRecipes() {
               setSelectedIngredients([...selectedIngredients, ing]);
             setFilterText("");
           }}
+          testID="filter-add"
         >
           <Text style={styles.addButtonText}>Add</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.filterSection}>
-        <TextInput
-          style={styles.input}
-          placeholder="Max time (minutes)"
-          keyboardType="numeric"
-          value={maxTime?.toString() ?? ""}
-          onChangeText={(text) => {
-            if (text.trim() === "") {
-              setMaxTime(null);
-              return;
-            }
-            const value = Number(text);
-            setMaxTime(isNaN(value) ? null : value);
-          }}
-        />
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => setShowFilters((s) => !s)}
+          testID="advanced-filters-toggle"
+        >
+          <Text style={styles.addButtonText}>
+            {`Show filters ${showFilters ? "−" : "+"}`}
+          </Text>
+        </TouchableOpacity>
       </View>
+
+      {showFilters && (
+        <>
+          <View style={styles.filterSection}>
+            <TextInput
+              style={styles.input}
+              placeholder="Max time (minutes)"
+              keyboardType="numeric"
+              value={maxTime?.toString() ?? ""}
+              onChangeText={(text) => {
+                if (text.trim() === "") {
+                  setMaxTime(null);
+                  return;
+                }
+                const value = Number(text);
+                setMaxTime(isNaN(value) ? null : value);
+              }}
+            />
+          </View>
+
+          <View style={styles.filterSection}>
+            <TextInput
+              style={styles.input}
+              placeholder="Max price (€)"
+              keyboardType="numeric"
+              value={maxPrice?.toString() ?? ""}
+              onChangeText={(text) => {
+                if (text.trim() === "") {
+                  setMaxPrice(null);
+                  return;
+                }
+                const value = Number(text);
+                setMaxPrice(isNaN(value) ? null : value);
+              }}
+            />
+          </View>
+        </>
+      )}
 
       <View style={styles.selectedList}>
         {selectedIngredients.map((ing) => (
@@ -170,6 +224,10 @@ export default function FetchRecipes() {
               onToggleFavorite={(id) => handleToggleFavorite(id)}
               showServingsControls={true}
               containerStyle={styles.recipeCard}
+              titleTestID={`recipe-title-${recipe.id}`}
+              favoriteTestID={`recipe-fav-button-${recipe.id}`}
+              wrapperTestID={`recipe-wrapper-${recipe.id}`}
+              ingredientsTestID={`recipe-ingredients-${recipe.id}`}
             />
           );
         })}

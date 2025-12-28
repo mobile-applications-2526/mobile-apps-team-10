@@ -83,6 +83,7 @@ export default function FavoritesScreen() {
           }
           style={styles.listWrapper}
         >
+
           {favoriteRecipes.map((r) => (
             <ExpandableRecipe
               key={r.id}
@@ -91,6 +92,10 @@ export default function FavoritesScreen() {
               onToggleFavorite={() => toggleFavorite(r.id)}
               showServingsControls={true}
               containerStyle={styles.card}
+              titleTestID={`recipe-title-${r.id}`}
+              favoriteTestID={`recipe-fav-button-${r.id}`}
+              wrapperTestID={`recipe-wrapper-${r.id}`}
+              ingredientsTestID={`recipe-ingredients-${r.id}`}
             />
           ))}
         </ScrollView>

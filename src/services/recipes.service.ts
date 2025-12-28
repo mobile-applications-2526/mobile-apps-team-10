@@ -1,5 +1,6 @@
 import { supabase } from "@/src/supabase/supabase";
 import { Recipe } from "../types";
+import { calculateRecipePrice } from "@/src/utils/pricing";
 export class RecipesService {
   async fetchAll(): Promise<Recipe[]> {
     const { data, error } = await supabase.from("recipes").select(`
@@ -12,7 +13,7 @@ export class RecipesService {
           quantity,
           unit,
           ingredient_id,
-          ingredients (name)
+          ingredients (name, price_per_unit)
         )
       `);
 
@@ -32,6 +33,19 @@ export class RecipesService {
       recipe.time_minutes <= maxTime
   );
 }
+
+filterByMaxPrice(
+  recipes: Recipe[],
+  maxPrice: number | null,
+  servings: number = 1
+): Recipe[] {
+  if (maxPrice === null) return recipes;
+
+  return recipes.filter(
+    (recipe) => calculateRecipePrice(recipe, servings) <= maxPrice
+  );
+}
+
 
   filterByIngredients(
     recipes: Recipe[],

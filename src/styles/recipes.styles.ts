@@ -12,6 +12,7 @@ export const createRecipeStyles = (theme: Theme) =>
       paddingVertical: theme.spacing.sm,
       alignItems: "center",
       backgroundColor: theme.colors.background,
+      marginTop: 10,
     },
     pageTitle: {
       fontSize: theme.fontSizes.xl,
@@ -116,17 +117,6 @@ export const createRecipeStyles = (theme: Theme) =>
     remove: {
       marginLeft: 6,
       color: theme.colors.danger,
-      fontWeight: theme.fontWeights.bold,
-    },
-    filterButton: {
-      backgroundColor: theme.colors.primary,
-      paddingVertical: 8,
-      paddingHorizontal: 12,
-      borderRadius: theme.radii.md,
-      marginLeft: 5,
-    },
-    filterButtonText: {
-      color: theme.colors.white,
       fontWeight: theme.fontWeights.bold,
     },
     loadingContainer: {

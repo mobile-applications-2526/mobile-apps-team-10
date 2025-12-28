@@ -16,52 +16,79 @@ export class FavoritesService {
     await AsyncStorage.setItem(PENDING_OPS_KEY, JSON.stringify(ops));
   }
 
+  private async updateLocal(recipeId: number, type: "add" | "remove") {
+    const localRaw = await AsyncStorage.getItem(LOCAL_FAVORITES_KEY);
+    let local: number[] = localRaw ? JSON.parse(localRaw) : [];
+
+    if (type === "add" && !local.includes(recipeId)) local.push(recipeId);
+    if (type === "remove") local = local.filter((id) => id !== recipeId);
+
+    await AsyncStorage.setItem(LOCAL_FAVORITES_KEY, JSON.stringify(local));
+
+    const pending = await this.getPendingOps();
+    pending.push({ type, recipeId });
+    await this.savePendingOps(pending);
+  }
+
   async getFavorites(userId: string) {
-    // 1. Get local favorites
+    // E2E hook: browser only
+    try {
+      const win = typeof window !== "undefined" ? (window as any) : undefined;
+      if (win && win.__E2E_FAVORITES && userId && win.__E2E_FAVORITES[userId]) {
+        return win.__E2E_FAVORITES[userId];
+      }
+    } catch {}
+
+    // 1. local storage (mobile)
     let local: number[] = [];
     try {
       const l = await AsyncStorage.getItem(LOCAL_FAVORITES_KEY);
       local = l ? JSON.parse(l) : [];
     } catch {}
 
-    // 2. Apply pending ops
+    // 2. apply pending ops
     const pending = await this.getPendingOps();
     pending.forEach((op) => {
-      if (op.type === "add" && !local.includes(op.recipeId))
-        local.push(op.recipeId);
-      if (op.type === "remove")
-        local = local.filter((id) => id !== op.recipeId);
+      if (op.type === "add" && !local.includes(op.recipeId)) local.push(op.recipeId);
+      if (op.type === "remove") local = local.filter((id) => id !== op.recipeId);
     });
 
     return local;
   }
 
   async addFavorite(recipeId: number) {
+    // E2E hook: browser only
+    try {
+      const win = typeof window !== "undefined" ? (window as any) : undefined;
+      if (win && win.__E2E_USER) {
+        const uid = win.__E2E_USER.id;
+        win.__E2E_FAVORITES = win.__E2E_FAVORITES || {};
+        win.__E2E_FAVORITES[uid] = win.__E2E_FAVORITES[uid] || [];
+        if (!win.__E2E_FAVORITES[uid].includes(recipeId)) win.__E2E_FAVORITES[uid].push(recipeId);
+        return;
+      }
+    } catch {}
+
+    // Mobile / offline
     await this.updateLocal(recipeId, "add");
     await this.trySync();
   }
 
   async removeFavorite(recipeId: number) {
+    // E2E hook: browser only
+    try {
+      const win = typeof window !== "undefined" ? (window as any) : undefined;
+      if (win && win.__E2E_USER) {
+        const uid = win.__E2E_USER.id;
+        win.__E2E_FAVORITES = win.__E2E_FAVORITES || {};
+        win.__E2E_FAVORITES[uid] = (win.__E2E_FAVORITES[uid] || []).filter((id: number) => id !== recipeId);
+        return;
+      }
+    } catch {}
+
+    // Mobile / offline
     await this.updateLocal(recipeId, "remove");
     await this.trySync();
-  }
-
-  private async updateLocal(recipeId: number, type: "add" | "remove") {
-    // update local storage
-    const local = await AsyncStorage.getItem(LOCAL_FAVORITES_KEY);
-    let favorites: number[] = local ? JSON.parse(local) : [];
-
-    if (type === "add" && !favorites.includes(recipeId))
-      favorites.push(recipeId);
-    if (type === "remove")
-      favorites = favorites.filter((id) => id !== recipeId);
-
-    await AsyncStorage.setItem(LOCAL_FAVORITES_KEY, JSON.stringify(favorites));
-
-    // update pending queue
-    const pending = await this.getPendingOps();
-    pending.push({ type, recipeId });
-    await this.savePendingOps(pending);
   }
 
   async trySync() {
@@ -86,7 +113,7 @@ export class FavoritesService {
             .eq("recipe_id", op.recipeId);
         }
       } catch {
-        remaining.push(op); // still offline/unable to sync
+        remaining.push(op);
       }
     }
 

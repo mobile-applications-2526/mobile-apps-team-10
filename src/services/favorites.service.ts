@@ -1,32 +1,65 @@
 import { supabase } from "@/src/supabase/supabase";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const LOCAL_FAVORITES_KEY = "favorites_local";
+const PENDING_OPS_KEY = "favorites_pending_ops";
+
+type PendingOp = { type: "add" | "remove"; recipeId: number };
 
 export class FavoritesService {
+  private async getPendingOps(): Promise<PendingOp[]> {
+    const ops = await AsyncStorage.getItem(PENDING_OPS_KEY);
+    return ops ? JSON.parse(ops) : [];
+  }
+
+  private async savePendingOps(ops: PendingOp[]) {
+    await AsyncStorage.setItem(PENDING_OPS_KEY, JSON.stringify(ops));
+  }
+
+  private async updateLocal(recipeId: number, type: "add" | "remove") {
+    const localRaw = await AsyncStorage.getItem(LOCAL_FAVORITES_KEY);
+    let local: number[] = localRaw ? JSON.parse(localRaw) : [];
+
+    if (type === "add" && !local.includes(recipeId)) local.push(recipeId);
+    if (type === "remove") local = local.filter((id) => id !== recipeId);
+
+    await AsyncStorage.setItem(LOCAL_FAVORITES_KEY, JSON.stringify(local));
+
+    const pending = await this.getPendingOps();
+    pending.push({ type, recipeId });
+    await this.savePendingOps(pending);
+  }
+
   async getFavorites(userId: string) {
-    // E2E hook: read favorites from window.__E2E_FAVORITES if present (fast, deterministic for tests)
+    // E2E hook: browser only
     try {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const win = typeof window !== 'undefined' ? (window as any) : undefined;
+      const win = typeof window !== "undefined" ? (window as any) : undefined;
       if (win && win.__E2E_FAVORITES && userId && win.__E2E_FAVORITES[userId]) {
         return win.__E2E_FAVORITES[userId];
       }
-    } catch (e) {
-      // ignore in non-browser env
-    }
-    const { data } = await supabase
-      .from("favorites")
-      .select("recipe_id")
-      .eq("user_id", userId);
+    } catch {}
 
-    return data?.map((f) => f.recipe_id) ?? [];
+    // 1. local storage (mobile)
+    let local: number[] = [];
+    try {
+      const l = await AsyncStorage.getItem(LOCAL_FAVORITES_KEY);
+      local = l ? JSON.parse(l) : [];
+    } catch {}
+
+    // 2. apply pending ops
+    const pending = await this.getPendingOps();
+    pending.forEach((op) => {
+      if (op.type === "add" && !local.includes(op.recipeId)) local.push(op.recipeId);
+      if (op.type === "remove") local = local.filter((id) => id !== op.recipeId);
+    });
+
+    return local;
   }
 
   async addFavorite(recipeId: number) {
-    // E2E hook: mutate window.__E2E_FAVORITES if present
+    // E2E hook: browser only
     try {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const win = typeof window !== 'undefined' ? (window as any) : undefined;
+      const win = typeof window !== "undefined" ? (window as any) : undefined;
       if (win && win.__E2E_USER) {
         const uid = win.__E2E_USER.id;
         win.__E2E_FAVORITES = win.__E2E_FAVORITES || {};
@@ -34,47 +67,57 @@ export class FavoritesService {
         if (!win.__E2E_FAVORITES[uid].includes(recipeId)) win.__E2E_FAVORITES[uid].push(recipeId);
         return;
       }
-    } catch (e) {
-      // ignore
-    }
+    } catch {}
 
-    const { data } = await supabase.auth.getSession();
-    const user = data.session?.user;
-    if (!user) throw new Error("Not logged in");
-
-    const { error } = await supabase
-      .from("favorites")
-      .insert([{ user_id: user.id, recipe_id: recipeId }]);
-
-    if (error) throw error;
+    // Mobile / offline
+    await this.updateLocal(recipeId, "add");
+    await this.trySync();
   }
 
-  async removeFavorite(recipeId: number): Promise<void> {
-    // E2E hook: mutate window.__E2E_FAVORITES if present
+  async removeFavorite(recipeId: number) {
+    // E2E hook: browser only
     try {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const win = typeof window !== 'undefined' ? (window as any) : undefined;
+      const win = typeof window !== "undefined" ? (window as any) : undefined;
       if (win && win.__E2E_USER) {
         const uid = win.__E2E_USER.id;
         win.__E2E_FAVORITES = win.__E2E_FAVORITES || {};
         win.__E2E_FAVORITES[uid] = (win.__E2E_FAVORITES[uid] || []).filter((id: number) => id !== recipeId);
         return;
       }
-    } catch (e) {
-      // ignore
-    }
+    } catch {}
 
+    // Mobile / offline
+    await this.updateLocal(recipeId, "remove");
+    await this.trySync();
+  }
+
+  async trySync() {
     const { data } = await supabase.auth.getSession();
     const user = data.session?.user;
-    if (!user) throw new Error("Not logged in");
+    if (!user) return; // offline
 
-    const { error } = await supabase
-      .from("favorites")
-      .delete()
-      .eq("user_id", user.id)
-      .eq("recipe_id", recipeId);
-    if (error) throw error;
+    let pending = await this.getPendingOps();
+    const remaining: PendingOp[] = [];
+
+    for (const op of pending) {
+      try {
+        if (op.type === "add") {
+          await supabase
+            .from("favorites")
+            .insert([{ user_id: user.id, recipe_id: op.recipeId }]);
+        } else if (op.type === "remove") {
+          await supabase
+            .from("favorites")
+            .delete()
+            .eq("user_id", user.id)
+            .eq("recipe_id", op.recipeId);
+        }
+      } catch {
+        remaining.push(op);
+      }
+    }
+
+    await this.savePendingOps(remaining);
   }
 }
 

@@ -1,15 +1,18 @@
 import { useTheme } from "@/src/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { Recipe } from "@types";
-import React, { useEffect, useState } from "react";
+import { Link } from "expo-router";
+import React, { useState } from "react";
 import {
   GestureResponderEvent,
+  Pressable,
   Text,
   TextStyle,
   TouchableOpacity,
   View,
   ViewStyle,
 } from "react-native";
+import { useRecipeChecklist } from "../hooks/useRecipeChecklist";
 import { createExpandableStyles } from "../styles/expandable.styles";
 
 /**
@@ -81,51 +84,24 @@ export default function ExpandableRecipe({
 }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [servings, setServings] = useState<number>(1);
-  const [checkedIds, setCheckedIds] = useState<number[]>([]);
 
-  const storageKey = `checklist:${recipe.id}`;
+  const ingredientsChecklist = useRecipeChecklist(recipe.id, "ingredients");
+  const stepsChecklist = useRecipeChecklist(recipe.id, "steps");
 
   const theme = useTheme();
   const styles = createExpandableStyles(theme as any);
-
-  useEffect(() => {
-    try {
-      if (typeof localStorage !== "undefined") {
-        const raw = localStorage.getItem(storageKey);
-        if (raw) setCheckedIds(JSON.parse(raw));
-      }
-    } catch {}
-  }, [storageKey]);
-
-  useEffect(() => {
-    try {
-      if (typeof localStorage !== "undefined") {
-        localStorage.setItem(storageKey, JSON.stringify(checkedIds));
-      }
-    } catch {}
-  }, [checkedIds, storageKey]);
-
-  const toggleChecked = (ingredientId: number, e?: GestureResponderEvent) => {
-    e?.stopPropagation();
-    setCheckedIds((prev) =>
-      prev.includes(ingredientId)
-        ? prev.filter((id) => id !== ingredientId)
-        : [...prev, ingredientId]
-    );
-  };
-
   const toggleExpanded = () => setExpanded((s) => !s);
 
   const increase = (e?: GestureResponderEvent) => {
     e?.stopPropagation();
     setServings((s) => s + 1);
-    setCheckedIds([]);
+    ingredientsChecklist.reset();
   };
 
   const decrease = (e?: GestureResponderEvent) => {
     e?.stopPropagation();
     setServings((s) => Math.max(1, s - 1));
-    setCheckedIds([]);
+    ingredientsChecklist.reset();
   };
 
   const handleToggleFavorite = (e?: GestureResponderEvent) => {
@@ -163,10 +139,16 @@ export default function ExpandableRecipe({
       style={[styles.card, containerStyle]}
       onPress={toggleExpanded}
       testID={wrapperTestID}
+      activeOpacity={1}
     >
       <View style={styles.rowBetween}>
-        <Text testID={titleTestID} style={[styles.title, titleStyle]}>{recipe.title}</Text>
-        <TouchableOpacity testID={favoriteTestID} onPress={handleToggleFavorite}>
+        <Text testID={titleTestID} style={[styles.title, titleStyle]}>
+          {recipe.title}
+        </Text>
+        <TouchableOpacity
+          testID={favoriteTestID}
+          onPress={handleToggleFavorite}
+        >
           <Ionicons
             name={isFavorite ? "heart" : "heart-outline"}
             size={24}
@@ -217,50 +199,59 @@ export default function ExpandableRecipe({
             </View>
           )}
 
-          <Text style={[styles.subheading, subheadingStyle]}>
-            Ingredients:
-          </Text>
+          <Text style={[styles.subheading, subheadingStyle]}>Ingredients:</Text>
 
           <View testID={ingredientsTestID}>
-          {recipe.recipe_ingredients.map((ri) => {
-            const scaled = ri.quantity * servings;
-            const checked = checkedIds.includes(ri.ingredient_id);
+            {recipe.recipe_ingredients.map((ri) => {
+              const scaled = ri.quantity * servings;
+              const checked = ingredientsChecklist.checked.includes(
+                ri.ingredient_id
+              );
 
-            return (
-              <View key={ri.ingredient_id} style={styles.ingredientRow}>
-                <TouchableOpacity
-                  onPress={(e) => toggleChecked(ri.ingredient_id, e)}
-                  style={styles.checkboxTouchable}
-                >
-                  <Ionicons
-                    name={checked ? "checkmark-circle" : "ellipse-outline"}
-                    size={20}
-                    color={checked ? "green" : "gray"}
-                  />
-                </TouchableOpacity>
+              return (
+                <View key={ri.ingredient_id} style={styles.ingredientRow}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      ingredientsChecklist.toggle(ri.ingredient_id)
+                    }
+                    style={styles.checkboxTouchable}
+                  >
+                    <Ionicons
+                      name={checked ? "checkmark-circle" : "ellipse-outline"}
+                      size={20}
+                      color={checked ? "green" : "gray"}
+                    />
+                  </TouchableOpacity>
 
-                <TouchableOpacity
-                  onPress={(e) => toggleChecked(ri.ingredient_id, e)}
-                  style={{ flex: 1 }}
-                >
-                  <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                    <Text
-                      style={[
-                        styles.ingredientText,
-                        checked ? styles.ingredientChecked : null,
-                      ]}
+                  <TouchableOpacity
+                    onPress={() =>
+                      ingredientsChecklist.toggle(ri.ingredient_id)
+                    }
+                    style={{ flex: 1 }}
+                  >
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                      }}
                     >
-                      {formatQuantity(scaled)} {ri.unit} {ri.ingredients.name}
-                    </Text>
+                      <Text
+                        style={[
+                          styles.ingredientText,
+                          checked ? styles.ingredientChecked : null,
+                        ]}
+                      >
+                        {formatQuantity(scaled)} {ri.unit} {ri.ingredients.name}
+                      </Text>
 
-                    <Text style={{ color: "#666", fontSize: 13 }}>
-                      €{calculateIngredientPrice(ri).toFixed(2)}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-            );
-          })}
+                      <Text style={{ color: "#666", fontSize: 13 }}>
+                        €{calculateIngredientPrice(ri).toFixed(2)}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
           </View>
 
           <Text style={[styles.subheading, subheadingStyle]}>Steps:</Text>
@@ -269,6 +260,15 @@ export default function ExpandableRecipe({
               {index + 1}. {step}
             </Text>
           ))}
+          <Link
+            href={`/recipes/${recipe.id}`}
+            asChild
+            style={styles.goToRecipeButton}
+          >
+            <Pressable>
+              <Text>View Details</Text>
+            </Pressable>
+          </Link>
         </View>
       )}
     </TouchableOpacity>

@@ -12,6 +12,7 @@ export const createRecipeStyles = (theme: Theme) =>
       paddingVertical: theme.spacing.sm,
       alignItems: "center",
       backgroundColor: theme.colors.background,
+      marginTop: 10,
     },
     pageTitle: {
       fontSize: theme.fontSizes.xl,

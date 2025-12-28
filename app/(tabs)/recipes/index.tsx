@@ -42,7 +42,7 @@ export default function FetchRecipes() {
       // E2E fallback
       try {
         // @ts-ignore
-        const win = typeof window !== 'undefined' ? (window as any) : undefined;
+        const win = typeof window !== "undefined" ? (window as any) : undefined;
         const e2eUser = win && win.__E2E_USER ? win.__E2E_USER : null;
         setUser(data.session?.user ?? e2eUser ?? null);
       } catch (e) {
@@ -53,14 +53,15 @@ export default function FetchRecipes() {
     const { data: listener } = SessionService.onAuthStateChange(
       (_event, session) => {
         try {
-        // @ts-ignore
-        const win = typeof window !== 'undefined' ? (window as any) : undefined;
-        const e2eUser = win && win.__E2E_USER ? win.__E2E_USER : null;
-        setUser(session?.user ?? e2eUser ?? null);
-      } catch (e) {
-        setUser(session?.user ?? null);
+          // @ts-ignore
+          const win =
+            typeof window !== "undefined" ? (window as any) : undefined;
+          const e2eUser = win && win.__E2E_USER ? win.__E2E_USER : null;
+          setUser(session?.user ?? e2eUser ?? null);
+        } catch (e) {
+          setUser(session?.user ?? null);
         }
-    }
+      }
     );
     return () => listener.subscription.unsubscribe();
   }, []);
@@ -134,7 +135,8 @@ export default function FetchRecipes() {
               setSelectedIngredients([...selectedIngredients, ing]);
             setFilterText("");
           }}
-         testID="filter-add">
+          testID="filter-add"
+        >
           <Text style={styles.addButtonText}>Add</Text>
         </TouchableOpacity>
       </View>
@@ -145,9 +147,9 @@ export default function FetchRecipes() {
           onPress={() => setShowFilters((s) => !s)}
           testID="advanced-filters-toggle"
         >
-        <Text style={styles.addButtonText}>
-          {`Show filters ${showFilters ? '−' : '+'}`}
-        </Text>
+          <Text style={styles.addButtonText}>
+            {`Show filters ${showFilters ? "−" : "+"}`}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -168,26 +170,26 @@ export default function FetchRecipes() {
                 setMaxTime(isNaN(value) ? null : value);
               }}
             />
-           </View>
+          </View>
 
-           <View style={styles.filterSection}>
-             <TextInput
-               style={styles.input}
-               placeholder="Max price (€)"
-               keyboardType="numeric"
-               value={maxPrice?.toString() ?? ""}
-               onChangeText={(text) => {
-                 if (text.trim() === "") {
-                   setMaxPrice(null);
-                   return;
-                 }
-                 const value = Number(text);
-                 setMaxPrice(isNaN(value) ? null : value);
-               }}
-             />
-           </View>
-         </>
-       )}
+          <View style={styles.filterSection}>
+            <TextInput
+              style={styles.input}
+              placeholder="Max price (€)"
+              keyboardType="numeric"
+              value={maxPrice?.toString() ?? ""}
+              onChangeText={(text) => {
+                if (text.trim() === "") {
+                  setMaxPrice(null);
+                  return;
+                }
+                const value = Number(text);
+                setMaxPrice(isNaN(value) ? null : value);
+              }}
+            />
+          </View>
+        </>
+      )}
 
       <View style={styles.selectedList}>
         {selectedIngredients.map((ing) => (

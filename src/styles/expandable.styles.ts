@@ -63,7 +63,7 @@ export const createExpandableStyles = (theme: Theme) =>
       color: theme.colors.text,
     },
     ingredient: { marginBottom: 4, color: theme.colors.text },
-    step: { marginBottom: 4, color: theme.colors.text },
+    step: { marginVertical: 4, color: theme.colors.text },
     ingredientRow: {
       flexDirection: "row",
       alignItems: "center",
@@ -81,5 +81,14 @@ export const createExpandableStyles = (theme: Theme) =>
     ingredientChecked: {
       textDecorationLine: "line-through",
       color: theme.colors.placeholder,
+    },
+    goToRecipeButton: {
+      backgroundColor: theme.colors.accent,
+      marginTop: theme.spacing.md,
+      paddingVertical: 10,
+      paddingHorizontal: 18,
+      borderRadius: theme.radii.md,
+      justifyContent: "center",
+      alignItems: "center",
     },
   });

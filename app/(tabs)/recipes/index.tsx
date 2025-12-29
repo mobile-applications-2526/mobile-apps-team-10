@@ -256,6 +256,20 @@ export default function FetchRecipes() {
             <Text style={{ color: "red" }}>{errorMsg}</Text>
           </View>
         )}
+        {generating && (
+          <View
+            style={{
+              padding: 10,
+              backgroundColor: "#fee",
+              marginBottom: 10,
+              borderRadius: 4,
+            }}
+          >
+            <Text style={{ color: "red" }}>
+              Generating recipe... Please wait
+            </Text>
+          </View>
+        )}
         {filteredRecipes.length < 5 && !loading && (
           <TouchableOpacity
             style={[styles.generateButton]}
@@ -286,20 +300,6 @@ export default function FetchRecipes() {
             />
           );
         })}
-        {generating && (
-          <View
-            style={{
-              padding: 10,
-              backgroundColor: "#fee",
-              marginBottom: 10,
-              borderRadius: 4,
-            }}
-          >
-            <Text style={{ color: "red" }}>
-              Generating recipe... Please wait
-            </Text>
-          </View>
-        )}
       </ScrollView>
       {showLoginModal && <LoginModal setShowLoginModal={setShowLoginModal} />}
     </View>

@@ -1,9 +1,13 @@
+import LoginModal from "@/app/(modals)/LoginModal";
 import { useTheme } from "@/src/hooks/useTheme";
+import SessionService from "@/src/services/session.service";
 import { createFullRecipeStyles } from "@/src/styles/fullRecipe.styles";
 import { Recipe } from "@/src/types";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { User } from "@supabase/supabase-js";
+import React, { useEffect, useState } from "react";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { useFavorites } from "../context/FavoritesContext";
 import { useRecipeChecklist } from "../hooks/useRecipeChecklist";
 
 const UNIT_MULTIPLIERS: Record<string, number> = {
@@ -50,6 +54,39 @@ export default function FullRecipe({
   const ingredientsChecklist = useRecipeChecklist(recipe.id, "ingredients");
   const stepsChecklist = useRecipeChecklist(recipe.id, "steps");
 
+  const [user, setUser] = useState<User | null>(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  useEffect(() => {
+    const load = async () => {
+      const { data } = await SessionService.getSession();
+      // E2E fallback
+      try {
+        // @ts-ignore
+        const win = typeof window !== "undefined" ? (window as any) : undefined;
+        const e2eUser = win && win.__E2E_USER ? win.__E2E_USER : null;
+        setUser(data.session?.user ?? e2eUser ?? null);
+      } catch (e) {
+        setUser(data.session?.user ?? null);
+      }
+    };
+    load();
+    const { data: listener } = SessionService.onAuthStateChange(
+      (_event, session) => {
+        try {
+          // @ts-ignore
+          const win =
+            typeof window !== "undefined" ? (window as any) : undefined;
+          const e2eUser = win && win.__E2E_USER ? win.__E2E_USER : null;
+          setUser(session?.user ?? e2eUser ?? null);
+        } catch (e) {
+          setUser(session?.user ?? null);
+        }
+      }
+    );
+    return () => listener.subscription.unsubscribe();
+  }, []);
+
   const increase = () => {
     setServings((s) => s + 1);
     ingredientsChecklist.reset();
@@ -59,8 +96,6 @@ export default function FullRecipe({
     setServings((s) => Math.max(1, s - 1));
     ingredientsChecklist.reset();
   };
-
-  const handleToggleFavorite = () => onToggleFavorite?.(recipe.id);
 
   const formatQuantity = (value: number) => {
     if (Number.isInteger(value)) return value.toString();
@@ -84,17 +119,27 @@ export default function FullRecipe({
   };
 
   const formatPrice = (value: number) => `€${value.toFixed(2)}`;
+  const { favorites, toggleFavorite, refreshFavorites } = useFavorites();
+
+  const handleToggleFavorite = async (id: number) => {
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
+    await toggleFavorite(id);
+  };
 
   return (
     <View style={styles.screen}>
-      <View style={styles.content}>
+      <ScrollView style={styles.content}>
         <View style={styles.rowBetween}>
           <Text testID={titleTestID} style={[styles.title, titleStyle]}>
             {recipe.title}
           </Text>
           <TouchableOpacity
             testID={recipe.id.toString() + "-fav-button"}
-            onPress={handleToggleFavorite}
+            onPress={() => handleToggleFavorite(recipe.id)}
+            style={{ marginTop: 40, marginRight: 4 }}
           >
             <Ionicons
               name={isFavorite ? "heart" : "heart-outline"}
@@ -223,7 +268,8 @@ export default function FullRecipe({
             </View>
           );
         })}
-      </View>
+      </ScrollView>
+      {showLoginModal && <LoginModal setShowLoginModal={setShowLoginModal} />}
     </View>
   );
 }

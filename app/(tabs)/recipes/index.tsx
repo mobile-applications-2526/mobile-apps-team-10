@@ -1,14 +1,18 @@
 import ExpandableRecipe from "@/src/components/ExpandableRecipe";
 import { useFavorites } from "@/src/context/FavoritesContext";
 import { useTheme } from "@/src/hooks/useTheme";
+import {
+  generateRecipe,
+  saveGeneratedRecipe,
+} from "@/src/services/recipeGeneration.service";
 import RecipesService from "@/src/services/recipes.service";
 import SessionService from "@/src/services/session.service";
 import { createRecipeStyles } from "@/src/styles/recipes.styles";
 import { User } from "@supabase/supabase-js";
 import { Recipe } from "@types";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   RefreshControl,
   ScrollView,
   Text,
@@ -32,6 +36,8 @@ export default function FetchRecipes() {
   const [maxTime, setMaxTime] = useState<number | null>(null);
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+
+  const [generating, setGenerating] = useState(false);
 
   const theme = useTheme();
   const styles = createRecipeStyles(theme as any);
@@ -106,12 +112,24 @@ export default function FetchRecipes() {
     await toggleFavorite(id);
   };
 
-  if (loading)
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator />
-      </View>
-    );
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const handleGenerate = async () => {
+    if (selectedIngredients.length === 0) return;
+    setGenerating(true);
+    setErrorMsg(null);
+    try {
+      const generated = await generateRecipe(selectedIngredients);
+      const savedRecipe = await saveGeneratedRecipe(generated);
+      router.push(`/recipes/${savedRecipe.id}`);
+    } catch (err: any) {
+      console.error("Generation or save failed:", err);
+      setErrorMsg(
+        err.message || "Something went wrong while saving the recipe."
+      );
+    } finally {
+      setGenerating(false);
+    }
+  };
 
   return (
     <View style={styles.screen}>
@@ -194,7 +212,7 @@ export default function FetchRecipes() {
       <View style={styles.selectedList}>
         {selectedIngredients.map((ing) => (
           <View key={ing} style={styles.selectedItem}>
-            <Text>{ing}</Text>
+            <Text style={styles.ingredient}>{ing}</Text>
             <TouchableOpacity
               onPress={() =>
                 setSelectedIngredients(
@@ -214,6 +232,43 @@ export default function FetchRecipes() {
         }
         contentContainerStyle={styles.container}
       >
+        {loading && (
+          <View
+            style={{
+              padding: 10,
+              backgroundColor: "#fee",
+              marginBottom: 10,
+              borderRadius: 4,
+            }}
+          >
+            <Text style={{ color: "red" }}>Loading... Please wait</Text>
+          </View>
+        )}
+        {errorMsg && (
+          <View
+            style={{
+              padding: 10,
+              backgroundColor: "#fee",
+              marginBottom: 10,
+              borderRadius: 4,
+            }}
+          >
+            <Text style={{ color: "red" }}>{errorMsg}</Text>
+          </View>
+        )}
+        {filteredRecipes.length < 5 && !loading && (
+          <TouchableOpacity
+            style={[styles.generateButton]}
+            disabled={selectedIngredients.length === 0}
+            onPress={handleGenerate}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.addButtonText}>
+              Don't find what you're looking for? Generate a recipe with AI!
+            </Text>
+          </TouchableOpacity>
+        )}
+
         {filteredRecipes.map((recipe) => {
           const isExpanded = expandedIds.includes(recipe.id);
           return (
@@ -231,6 +286,20 @@ export default function FetchRecipes() {
             />
           );
         })}
+        {generating && (
+          <View
+            style={{
+              padding: 10,
+              backgroundColor: "#fee",
+              marginBottom: 10,
+              borderRadius: 4,
+            }}
+          >
+            <Text style={{ color: "red" }}>
+              Generating recipe... Please wait
+            </Text>
+          </View>
+        )}
       </ScrollView>
       {showLoginModal && <LoginModal setShowLoginModal={setShowLoginModal} />}
     </View>

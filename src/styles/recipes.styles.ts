@@ -59,7 +59,6 @@ export const createRecipeStyles = (theme: Theme) =>
       color: theme.colors.text,
     },
     ingredient: {
-      marginLeft: 12,
       fontSize: theme.fontSizes.sm,
       color: theme.colors.text,
     },
@@ -123,4 +122,13 @@ export const createRecipeStyles = (theme: Theme) =>
       marginTop: theme.spacing.xl,
       alignItems: "center",
     },
+    generateButton: {
+      backgroundColor: theme.colors.accent,
+      paddingVertical: 10,
+      paddingHorizontal: 18,
+      borderRadius: theme.radii.md,
+      maxWidth: "80%",
+      marginTop: 10,
+      marginBottom: 30,
+    }
   });

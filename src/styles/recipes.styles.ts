@@ -23,6 +23,8 @@ export const createRecipeStyles = (theme: Theme) =>
       padding: theme.spacing.md,
       alignItems: "center",
       paddingTop: theme.spacing.sm,
+      borderTopColor: theme.colors.border,
+      borderTopWidth: 1,
     },
     loading: {
       marginTop: 50,

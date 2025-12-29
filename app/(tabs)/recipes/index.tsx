@@ -189,7 +189,6 @@ export default function FetchRecipes() {
               }}
             />
           </View>
-
           <View style={styles.filterSection}>
             <TextInput
               style={styles.input}
@@ -208,7 +207,6 @@ export default function FetchRecipes() {
           </View>
         </>
       )}
-
       <View style={styles.selectedList}>
         {selectedIngredients.map((ing) => (
           <View key={ing} style={styles.selectedItem}>

@@ -11,7 +11,7 @@ import { createRecipeStyles } from "@/src/styles/recipes.styles";
 import { User } from "@supabase/supabase-js";
 import { Recipe } from "@types";
 import { router, useFocusEffect } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Keyboard,
@@ -239,18 +239,20 @@ export default function FetchRecipes() {
         ) : null}
         <View style={styles.selectedList}>
           {selectedIngredients.map((ing) => (
-            <View key={ing} style={styles.selectedItem}>
+            <TouchableOpacity
+              key={ing}
+              style={styles.selectedItem}
+              onPress={() =>
+                setSelectedIngredients(
+                  selectedIngredients.filter((i) => i !== ing)
+                )
+              }
+            >
               <Text style={{ color: theme.colors.text }}>{ing}</Text>
-              <TouchableOpacity
-                onPress={() =>
-                  setSelectedIngredients(
-                    selectedIngredients.filter((i) => i !== ing)
-                  )
-                }
-              >
+              <TouchableOpacity>
                 <Text style={styles.remove}>X</Text>
               </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
 

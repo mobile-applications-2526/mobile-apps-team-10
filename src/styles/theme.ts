@@ -2,7 +2,7 @@ import { TextStyle } from "react-native";
 
 const theme = {
   spacing: {
-    xs: 6,
+    xs: 4,
     sm: 8,
     md: 12,
     lg: 20,
@@ -42,6 +42,9 @@ export const lightTheme = {
     danger: "red",
     white: "#ffffff",
     modalBackground: "rgba(0,0,0,0.3)",
+    errorBackground: "#FFFBE6",
+    errorBorder: "#FFE58F",
+    errorText: "#ba1c1cff",
   },
 };
 
@@ -58,6 +61,9 @@ export const darkTheme = {
     danger: "#ff6b6b",
     white: "#ffffff",
     modalBackground: "rgba(255,255,255,0.2)",
+    errorBackground: "#a47a43ff",
+    errorBorder: "#c39959ff",
+    errorText: "#ffffff",
   },
 };
 

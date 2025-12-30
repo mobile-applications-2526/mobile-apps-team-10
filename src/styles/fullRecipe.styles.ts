@@ -42,6 +42,7 @@ export const createFullRecipeStyles = (theme: Theme) =>
       color: theme.colors.text,
       opacity: 0.8,
       marginBottom: theme.spacing.sm,
+      marginTop: theme.spacing.sm,
     },
     rowBetween: {
       flexDirection: "row",
@@ -139,8 +140,9 @@ export const createFullRecipeStyles = (theme: Theme) =>
     step: {
       fontSize: theme.fontSizes.sm,
       color: theme.colors.text,
-      marginBottom: theme.spacing.xs,
+
       lineHeight: 20,
+      marginTop: theme.spacing.xs
     },
     stepRow: {
       flexDirection: "row",

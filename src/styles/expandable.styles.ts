@@ -27,10 +27,10 @@ export const createExpandableStyles = (theme: Theme) =>
     description: {
       color: theme.colors.text,
       opacity: 0.8,
-      marginTop: theme.spacing.xs,
+      marginTop: theme.spacing.sm,
     },
     time: {
-      marginTop: theme.spacing.xs,
+      marginTop: theme.spacing.sm,
       color: theme.colors.text,
       opacity: 0.8,
     },
@@ -40,7 +40,7 @@ export const createExpandableStyles = (theme: Theme) =>
       alignItems: "center",
       marginBottom: theme.spacing.sm,
     },
-    personsLabel: { marginRight: theme.spacing.xs, color: theme.colors.text },
+    personsLabel: { marginRight: theme.spacing.sm, color: theme.colors.text },
     servingsButton: {
       paddingHorizontal: 10,
       paddingVertical: 6,

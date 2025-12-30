@@ -45,17 +45,17 @@ export default function FetchRecipes() {
   useEffect(() => {
     const load = async () => {
       const { data } = await SessionService.getSession();
-      // E2E fallback
       try {
         // @ts-ignore
         const win = typeof window !== "undefined" ? (window as any) : undefined;
         const e2eUser = win && win.__E2E_USER ? win.__E2E_USER : null;
         setUser(data.session?.user ?? e2eUser ?? null);
-      } catch (e) {
+      } catch {
         setUser(data.session?.user ?? null);
       }
     };
     load();
+
     const { data: listener } = SessionService.onAuthStateChange(
       (_event, session) => {
         try {
@@ -64,11 +64,12 @@ export default function FetchRecipes() {
             typeof window !== "undefined" ? (window as any) : undefined;
           const e2eUser = win && win.__E2E_USER ? win.__E2E_USER : null;
           setUser(session?.user ?? e2eUser ?? null);
-        } catch (e) {
+        } catch {
           setUser(session?.user ?? null);
         }
       }
     );
+
     return () => listener.subscription.unsubscribe();
   }, []);
 
@@ -141,6 +142,7 @@ export default function FetchRecipes() {
         <TextInput
           style={styles.input}
           placeholder="Enter ingredient..."
+          placeholderTextColor={theme.colors.placeholder}
           value={filterText}
           onChangeText={setFilterText}
           testID="filter-input"
@@ -149,8 +151,9 @@ export default function FetchRecipes() {
           style={styles.addButton}
           onPress={() => {
             const ing = filterText.trim().toLowerCase();
-            if (ing && !selectedIngredients.includes(ing))
+            if (ing && !selectedIngredients.includes(ing)) {
               setSelectedIngredients([...selectedIngredients, ing]);
+            }
             setFilterText("");
           }}
           testID="filter-add"
@@ -177,6 +180,7 @@ export default function FetchRecipes() {
             <TextInput
               style={styles.input}
               placeholder="Max time (minutes)"
+              placeholderTextColor={theme.colors.placeholder}
               keyboardType="numeric"
               value={maxTime?.toString() ?? ""}
               onChangeText={(text) => {
@@ -193,6 +197,7 @@ export default function FetchRecipes() {
             <TextInput
               style={styles.input}
               placeholder="Max price (€)"
+              placeholderTextColor={theme.colors.placeholder}
               keyboardType="numeric"
               value={maxPrice?.toString() ?? ""}
               onChangeText={(text) => {
@@ -210,7 +215,7 @@ export default function FetchRecipes() {
       <View style={styles.selectedList}>
         {selectedIngredients.map((ing) => (
           <View key={ing} style={styles.selectedItem}>
-            <Text style={styles.ingredient}>{ing}</Text>
+            <Text style={{ color: theme.colors.text }}>{ing}</Text>
             <TouchableOpacity
               onPress={() =>
                 setSelectedIngredients(
@@ -299,6 +304,7 @@ export default function FetchRecipes() {
           );
         })}
       </ScrollView>
+
       {showLoginModal && <LoginModal setShowLoginModal={setShowLoginModal} />}
     </View>
   );

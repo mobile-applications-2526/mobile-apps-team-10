@@ -55,11 +55,19 @@ filterByMaxPrice(
       return recipes;
 
     return recipes.filter((recipe) =>
-      selectedIngredients.every((ing) =>
-        recipe.recipe_ingredients.some((ri) =>
-          ri.ingredients.name.toLowerCase().includes(ing.toLowerCase())
-        )
-      )
+    selectedIngredients.every((ing) => {
+      const needle = ing.toLowerCase();
+
+      const matchesIngredient = recipe.recipe_ingredients.some((ri) =>
+        ri.ingredients.name.toLowerCase().includes(needle)
+      );
+
+      const matchesTitle = recipe.title
+        ?.toLowerCase()
+        .includes(needle);
+
+      return matchesIngredient || matchesTitle;
+    })
     );
   }
 }

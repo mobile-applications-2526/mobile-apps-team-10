@@ -42,6 +42,10 @@ export default function FetchRecipes() {
 
   const [generating, setGenerating] = useState(false);
 
+  const PAGE_SIZE = 10;
+
+  const [page, setPage] = useState(1);
+
   const theme = useTheme();
   const styles = createRecipeStyles(theme as any);
 
@@ -121,7 +125,9 @@ export default function FetchRecipes() {
     );
     result = RecipesService.filterByTime(result, maxTime);
     result = RecipesService.filterByMaxPrice(result, maxPrice);
+
     setFilteredRecipes(result);
+    setPage(1);
   }, [selectedIngredients, maxTime, maxPrice, recipes]);
 
   const handleToggleFavorite = async (id: number) => {
@@ -150,6 +156,8 @@ export default function FetchRecipes() {
       setGenerating(false);
     }
   };
+  const visibleRecipes = filteredRecipes.slice(0, page * PAGE_SIZE);
+  const hasMore = visibleRecipes.length < filteredRecipes.length;
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -347,6 +355,35 @@ export default function FetchRecipes() {
             );
           })}
         </ScrollView>
+        {visibleRecipes.map((recipe) => {
+          const isExpanded = expandedIds.includes(recipe.id);
+          return (
+            <ExpandableRecipe
+              key={recipe.id}
+              recipe={recipe}
+              isFavorite={favorites.includes(recipe.id)}
+              onToggleFavorite={(id) => handleToggleFavorite(id)}
+              showServingsControls={true}
+              containerStyle={styles.recipeCard}
+              titleTestID={`recipe-title-${recipe.id}`}
+              favoriteTestID={`recipe-fav-button-${recipe.id}`}
+              wrapperTestID={`recipe-wrapper-${recipe.id}`}
+              ingredientsTestID={`recipe-ingredients-${recipe.id}`}
+            />
+          );
+        })}
+
+    {hasMore && !loading && (
+      <TouchableOpacity
+        style={[styles.generateButton, { marginTop: 16 }]}
+        onPress={() => setPage((p) => p + 1)}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.addButtonText}>Load more recipes</Text>
+      </TouchableOpacity>
+    )}
+
+      </ScrollView>
 
         {showLoginModal ? (
           <LoginModal setShowLoginModal={setShowLoginModal} />

@@ -16,6 +16,7 @@ export default function AddRecipeScreen() {
   const theme = useTheme();
 
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("")
   const [time, setTime] = useState("");
   const [steps, setSteps] = useState<string[]>([""]);
   const [ingredients, setIngredients] = useState<
@@ -35,6 +36,7 @@ export default function AddRecipeScreen() {
 
     const recipe = {
       title,
+      description,
       cookingTimeMinutes: Number(time) || 30,
       steps: steps.filter((s) => s.trim().length > 0),
       ingredients: ingredients
@@ -43,6 +45,7 @@ export default function AddRecipeScreen() {
           name: i.name,
           quantity: i.quantity || 1,
           unit: i.unit || "unit",
+          price_estimate: i.price,
         })),
     };
 
@@ -86,6 +89,21 @@ export default function AddRecipeScreen() {
             marginBottom: 12,
           }}
         />
+        {/* DESCRIPTION */}
+        <TextInput
+                  placeholder="Description"
+                  placeholderTextColor={theme.colors.placeholder}
+                  value={description}
+                  onChangeText={setDescription}
+                  style={{
+                    borderWidth: 1,
+                    borderColor: theme.colors.border,
+                    padding: 12,
+                    borderRadius: 8,
+                    color: theme.colors.text,
+                    marginBottom: 12,
+                  }}
+                />
 
         {/* TIME */}
         <TextInput

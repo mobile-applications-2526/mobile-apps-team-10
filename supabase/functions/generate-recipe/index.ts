@@ -24,6 +24,7 @@ Deno.serve(async (req) => {
             type: "object",
             properties: {
               title: { type: "string" },
+              description: {type:"string"},
               steps: { type: "array", items: { type: "string" } },
               cookingTimeMinutes: { type: "number" },
               ingredients: {
@@ -41,7 +42,7 @@ Deno.serve(async (req) => {
                 }
               }
             },
-            required: ["title", "steps", "cookingTimeMinutes", "ingredients"],
+            required: ["title", "description", "steps", "cookingTimeMinutes", "ingredients"],
             additionalProperties: false
           }
         }

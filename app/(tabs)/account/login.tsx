@@ -48,14 +48,6 @@ export default function LoginScreen() {
 
         <TextInput
           placeholder="Email"
-          testID="input-email"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="Email"
           placeholderTextColor={theme.colors.placeholder}
           testID="input-email"
           value={email}
@@ -64,14 +56,6 @@ export default function LoginScreen() {
           style={styles.input}
         />
 
-        <TextInput
-          placeholder="Password"
-          testID="input-password"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-          style={styles.input}
-        />
         <TextInput
           placeholder="Password"
           placeholderTextColor={theme.colors.placeholder}

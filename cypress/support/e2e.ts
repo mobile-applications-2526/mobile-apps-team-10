@@ -21,4 +21,3 @@ Cypress.Commands.add('visitWithE2EUser', (url: string, user: any = { id: 'test-u
 });
 // debug: confirm support file is loaded in Cypress runner logs
 console.log('[Cypress support] e2e support file loaded')
-

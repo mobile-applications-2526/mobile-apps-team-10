@@ -212,7 +212,7 @@ export default function FetchRecipes() {
           </View>
         </>
       )}
-      <View style={styles.selectedList}>
+      <View style={styles.selectedList} testID="selected-ingredients">
         {selectedIngredients.map((ing) => (
           <View key={ing} style={styles.selectedItem}>
             <Text style={{ color: theme.colors.text }}>{ing}</Text>

@@ -6,9 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="058aafc8-9673-4cc8-9b35-fc306c4d82ad" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/recipes/addRecipe.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/recipes/addRecipe.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/services/recipeGeneration.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/recipeGeneration.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/supabase/functions/generate-recipe/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/supabase/functions/generate-recipe/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/recipes.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/recipes.service.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

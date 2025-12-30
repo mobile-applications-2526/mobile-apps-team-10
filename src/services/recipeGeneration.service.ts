@@ -34,6 +34,7 @@ interface GeneratedIngredient {
 
 type GeneratedRecipe = {
   title: string;
+  description: string;
   steps: string[];
   ingredients: (string | GeneratedIngredient)[];
   cookingTimeMinutes: number;
@@ -79,6 +80,7 @@ export const saveGeneratedRecipe = async (recipe: GeneratedRecipe) => {
       .insert([
         {
           title: recipe.title || "Untitled Recipe",
+          description: recipe.description || "No description",
           steps: recipe.steps || [],
           time_minutes: recipe.cookingTimeMinutes || 30,
         },

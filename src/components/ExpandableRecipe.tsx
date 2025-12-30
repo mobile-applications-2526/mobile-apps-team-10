@@ -118,7 +118,7 @@ export default function ExpandableRecipe({
           <Ionicons
             name={isFavorite ? "heart" : "heart-outline"}
             size={24}
-            color={isFavorite ? "red" : "black"}
+            color={isFavorite ? "red" : styles.ingredientText.color}
           />
         </TouchableOpacity>
       </View>

@@ -13,6 +13,7 @@ import { Recipe } from "@types";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   RefreshControl,
   ScrollView,
   Text,
@@ -235,45 +236,63 @@ export default function FetchRecipes() {
         }
         contentContainerStyle={styles.container}
       >
-        {loading && (
+        {generating || loading ? (
           <View
             style={{
-              padding: 10,
-              backgroundColor: "#fee",
-              marginBottom: 10,
-              borderRadius: 4,
+              backgroundColor: "rgba(255, 255, 255, 0.8)",
+              zIndex: 999,
+              justifyContent: "center",
+              alignItems: "center",
             }}
           >
-            <Text style={{ color: "red" }}>Loading... Please wait</Text>
+            <View
+              style={{
+                padding: 30,
+                backgroundColor: theme.colors.background,
+                elevation: 5,
+                alignItems: "center",
+              }}
+            >
+              <ActivityIndicator size="large" color="#FF7F50" />{" "}
+              {/* Use your primary brand color */}
+              <Text
+                style={{
+                  marginTop: 15,
+                  fontSize: 16,
+                  fontWeight: "600",
+                  color: theme.colors.text,
+                }}
+              >
+                {generating
+                  ? "Let 'm Cook is thinking..."
+                  : "Loading Recipes..."}
+              </Text>
+            </View>
           </View>
-        )}
-        {errorMsg && (
-          <View
-            style={{
-              padding: 10,
-              backgroundColor: "#fee",
-              marginBottom: 10,
-              borderRadius: 4,
-            }}
-          >
-            <Text style={{ color: "red" }}>{errorMsg}</Text>
-          </View>
-        )}
-        {generating && (
-          <View
-            style={{
-              padding: 10,
-              backgroundColor: "#fee",
-              marginBottom: 10,
-              borderRadius: 4,
-            }}
-          >
-            <Text style={{ color: "red" }}>
-              Generating recipe... Please wait
-            </Text>
-          </View>
-        )}
-        {filteredRecipes.length < 5 && !loading && (
+        ) : null}
+        {!errorMsg ||
+          (errorMsg && (
+            <View
+              style={{
+                backgroundColor: "#FFFBE6",
+                borderWidth: 1,
+                borderColor: "#FFE58F",
+                padding: 12,
+                marginHorizontal: 16,
+                marginBottom: 16,
+                borderRadius: 8,
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ color: "#856404", flex: 1 }}>{errorMsg}</Text>
+              <TouchableOpacity onPress={() => setErrorMsg(null)}>
+                <Text style={{ fontWeight: "bold", marginLeft: 10 }}>✕</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+
+        {filteredRecipes.length < 5 && !loading && !generating && (
           <TouchableOpacity
             style={[styles.generateButton]}
             disabled={selectedIngredients.length === 0}

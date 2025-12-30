@@ -2,7 +2,7 @@ import { TextStyle } from "react-native";
 
 const theme = {
   spacing: {
-    xs: 6,
+    xs: 4,
     sm: 8,
     md: 12,
     lg: 20,

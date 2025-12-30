@@ -12,7 +12,7 @@ export default function Index() {
         Welcome to Let 'm Cook
       </Text>
       <Image
-        source={require("../assets/logo.png")}
+        source={require("../../assets/images/logo.png")}
         style={styles.image}
         resizeMode="contain"
       />

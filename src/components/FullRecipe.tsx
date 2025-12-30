@@ -143,8 +143,8 @@ export default function FullRecipe({
           >
             <Ionicons
               name={isFavorite ? "heart" : "heart-outline"}
-              size={24}
-              color={isFavorite ? "red" : "black"}
+              size={30}
+              color={isFavorite ? "red" : styles.ingredientText.color}
             />
           </TouchableOpacity>
         </View>

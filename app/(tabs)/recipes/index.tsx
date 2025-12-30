@@ -10,8 +10,8 @@ import SessionService from "@/src/services/session.service";
 import { createRecipeStyles } from "@/src/styles/recipes.styles";
 import { User } from "@supabase/supabase-js";
 import { Recipe } from "@types";
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   RefreshControl,
@@ -79,6 +79,14 @@ export default function FetchRecipes() {
     await Promise.all([refreshFavorites(), loadRecipes()]);
     setRefreshing(false);
   };
+
+  // Refresh recipes when screen is focused
+  // This is useful when coming back from recipe details screen
+  useFocusEffect(
+    useCallback(() => {
+      loadRecipes();
+    }, [])
+  );
 
   const loadRecipes = async () => {
     try {
@@ -270,27 +278,26 @@ export default function FetchRecipes() {
             </View>
           </View>
         ) : null}
-        {!errorMsg ||
-          (errorMsg && (
-            <View
-              style={{
-                backgroundColor: "#FFFBE6",
-                borderWidth: 1,
-                borderColor: "#FFE58F",
-                padding: 12,
-                marginHorizontal: 16,
-                marginBottom: 16,
-                borderRadius: 8,
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <Text style={{ color: "#856404", flex: 1 }}>{errorMsg}</Text>
-              <TouchableOpacity onPress={() => setErrorMsg(null)}>
-                <Text style={{ fontWeight: "bold", marginLeft: 10 }}>✕</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
+        {errorMsg ? (
+          <View
+            style={{
+              backgroundColor: "#FFFBE6",
+              borderWidth: 1,
+              borderColor: "#FFE58F",
+              padding: 12,
+              marginHorizontal: 16,
+              marginBottom: 16,
+              borderRadius: 8,
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ color: "#856404", flex: 1 }}>{errorMsg}</Text>
+            <TouchableOpacity onPress={() => setErrorMsg(null)}>
+              <Text style={{ fontWeight: "bold", marginLeft: 10 }}>✕</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
 
         {filteredRecipes.length < 5 && !loading && !generating && (
           <TouchableOpacity

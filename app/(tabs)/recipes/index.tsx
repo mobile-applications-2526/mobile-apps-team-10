@@ -14,11 +14,13 @@ import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Keyboard,
   RefreshControl,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import LoginModal from "../../(modals)/LoginModal";
@@ -78,6 +80,14 @@ export default function FetchRecipes() {
     setRefreshing(true);
     await Promise.all([refreshFavorites(), loadRecipes()]);
     setRefreshing(false);
+  };
+
+  const handleAddIngredient = () => {
+    const ing = filterText.trim().toLowerCase();
+    if (ing && !selectedIngredients.includes(ing)) {
+      setSelectedIngredients([...selectedIngredients, ing]);
+    }
+    setFilterText("");
   };
 
   // Refresh recipes when screen is focused
@@ -142,196 +152,198 @@ export default function FetchRecipes() {
   };
 
   return (
-    <View style={styles.screen}>
-      <View style={styles.header}>
-        <Text style={styles.pageTitle}>Recipes</Text>
-      </View>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.screen}>
+        <View style={styles.header}>
+          <Text style={styles.pageTitle}>Recipes</Text>
+        </View>
 
-      <View style={styles.filterSection}>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter ingredient..."
-          placeholderTextColor={theme.colors.placeholder}
-          value={filterText}
-          onChangeText={setFilterText}
-          testID="filter-input"
-        />
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => {
-            const ing = filterText.trim().toLowerCase();
-            if (ing && !selectedIngredients.includes(ing)) {
-              setSelectedIngredients([...selectedIngredients, ing]);
-            }
-            setFilterText("");
-          }}
-          testID="filter-add"
-        >
-          <Text style={styles.addButtonText}>Add</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.filterSection}>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => setShowFilters((s) => !s)}
-          testID="advanced-filters-toggle"
-        >
-          <Text style={styles.addButtonText}>
-            {`Show filters ${showFilters ? "−" : "+"}`}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {showFilters && (
-        <>
-          <View style={styles.filterSection}>
-            <TextInput
-              style={styles.input}
-              placeholder="Max time (minutes)"
-              placeholderTextColor={theme.colors.placeholder}
-              keyboardType="numeric"
-              value={maxTime?.toString() ?? ""}
-              onChangeText={(text) => {
-                if (text.trim() === "") {
-                  setMaxTime(null);
-                  return;
-                }
-                const value = Number(text);
-                setMaxTime(isNaN(value) ? null : value);
-              }}
-            />
-          </View>
-          <View style={styles.filterSection}>
-            <TextInput
-              style={styles.input}
-              placeholder="Max price (€)"
-              placeholderTextColor={theme.colors.placeholder}
-              keyboardType="numeric"
-              value={maxPrice?.toString() ?? ""}
-              onChangeText={(text) => {
-                if (text.trim() === "") {
-                  setMaxPrice(null);
-                  return;
-                }
-                const value = Number(text);
-                setMaxPrice(isNaN(value) ? null : value);
-              }}
-            />
-          </View>
-        </>
-      )}
-      <View style={styles.selectedList}>
-        {selectedIngredients.map((ing) => (
-          <View key={ing} style={styles.selectedItem}>
-            <Text style={{ color: theme.colors.text }}>{ing}</Text>
-            <TouchableOpacity
-              onPress={() =>
-                setSelectedIngredients(
-                  selectedIngredients.filter((i) => i !== ing)
-                )
-              }
-            >
-              <Text style={styles.remove}>X</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
-      </View>
-
-      <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        contentContainerStyle={styles.container}
-      >
-        {generating || loading ? (
-          <View
-            style={{
-              backgroundColor: "rgba(255, 255, 255, 0.8)",
-              zIndex: 999,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
+        <View style={styles.filterSection}>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter ingredient..."
+            placeholderTextColor={theme.colors.placeholder}
+            value={filterText}
+            onChangeText={setFilterText}
+            onSubmitEditing={handleAddIngredient}
+            returnKeyType="done"
+            submitBehavior="submit"
+            testID="filter-input"
+          />
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={handleAddIngredient}
+            testID="filter-add"
           >
+            <Text style={styles.addButtonText}>Add</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.filterSection}>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => setShowFilters((s) => !s)}
+            testID="advanced-filters-toggle"
+          >
+            <Text style={styles.addButtonText}>
+              {`Show filters ${showFilters ? "−" : "+"}`}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {showFilters ? (
+          <>
+            <View style={styles.filterSection}>
+              <TextInput
+                style={styles.input}
+                placeholder="Max time (minutes)"
+                placeholderTextColor={theme.colors.placeholder}
+                keyboardType="numeric"
+                value={maxTime?.toString() ?? ""}
+                onChangeText={(text) => {
+                  if (text.trim() === "") {
+                    setMaxTime(null);
+                    return;
+                  }
+                  const value = Number(text);
+                  setMaxTime(isNaN(value) ? null : value);
+                }}
+              />
+            </View>
+            <View style={styles.filterSection}>
+              <TextInput
+                style={styles.input}
+                placeholder="Max price (€)"
+                placeholderTextColor={theme.colors.placeholder}
+                keyboardType="numeric"
+                value={maxPrice?.toString() ?? ""}
+                onChangeText={(text) => {
+                  if (text.trim() === "") {
+                    setMaxPrice(null);
+                    return;
+                  }
+                  const value = Number(text);
+                  setMaxPrice(isNaN(value) ? null : value);
+                }}
+              />
+            </View>
+          </>
+        ) : null}
+        <View style={styles.selectedList}>
+          {selectedIngredients.map((ing) => (
+            <View key={ing} style={styles.selectedItem}>
+              <Text style={{ color: theme.colors.text }}>{ing}</Text>
+              <TouchableOpacity
+                onPress={() =>
+                  setSelectedIngredients(
+                    selectedIngredients.filter((i) => i !== ing)
+                  )
+                }
+              >
+                <Text style={styles.remove}>X</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          contentContainerStyle={styles.container}
+        >
+          {!generating || loading ? (
             <View
               style={{
-                padding: 30,
-                backgroundColor: theme.colors.background,
-                elevation: 5,
+                zIndex: 999,
+                justifyContent: "center",
                 alignItems: "center",
               }}
             >
-              <ActivityIndicator size="large" color="#FF7F50" />{" "}
-              {/* Use your primary brand color */}
-              <Text
+              <View
                 style={{
-                  marginTop: 15,
-                  fontSize: 16,
-                  fontWeight: "600",
-                  color: theme.colors.text,
+                  padding: 30,
+                  backgroundColor: theme.colors.background,
+                  elevation: 5,
+                  alignItems: "center",
                 }}
               >
-                {generating
-                  ? "Let 'm Cook is thinking..."
-                  : "Loading Recipes..."}
-              </Text>
+                <ActivityIndicator size="large" color={theme.colors.accent} />
+                {/* Use your primary brand color */}
+                <Text
+                  style={{
+                    marginTop: 15,
+                    fontSize: 16,
+                    fontWeight: "600",
+                    color: theme.colors.text,
+                  }}
+                >
+                  {generating
+                    ? "Let 'm Cook is thinking..."
+                    : "Loading Recipes..."}
+                </Text>
+              </View>
             </View>
-          </View>
-        ) : null}
-        {errorMsg ? (
-          <View
-            style={{
-              backgroundColor: "#FFFBE6",
-              borderWidth: 1,
-              borderColor: "#FFE58F",
-              padding: 12,
-              marginHorizontal: 16,
-              marginBottom: 16,
-              borderRadius: 8,
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <Text style={{ color: "#856404", flex: 1 }}>{errorMsg}</Text>
-            <TouchableOpacity onPress={() => setErrorMsg(null)}>
-              <Text style={{ fontWeight: "bold", marginLeft: 10 }}>✕</Text>
+          ) : null}
+          {!errorMsg ? (
+            <View
+              style={{
+                backgroundColor: theme.colors.errorBackground,
+                borderWidth: 1,
+                borderColor: theme.colors.errorBorder,
+                padding: 12,
+                marginHorizontal: 16,
+                marginBottom: 16,
+                borderRadius: 8,
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ color: theme.colors.text, flex: 1 }}>
+                {errorMsg}error test
+              </Text>
+              <TouchableOpacity onPress={() => setErrorMsg(null)}>
+                <Text style={{ fontWeight: "bold", marginLeft: 10 }}>✕</Text>
+              </TouchableOpacity>
+            </View>
+          ) : null}
+
+          {filteredRecipes.length < 5 && !loading && !generating ? (
+            <TouchableOpacity
+              style={[styles.generateButton]}
+              disabled={selectedIngredients.length === 0}
+              onPress={handleGenerate}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.addButtonText}>
+                Don't find what you're looking for? Generate a recipe with AI!
+              </Text>
             </TouchableOpacity>
-          </View>
+          ) : null}
+
+          {filteredRecipes.map((recipe) => {
+            const isExpanded = expandedIds.includes(recipe.id);
+            return (
+              <ExpandableRecipe
+                key={recipe.id}
+                recipe={recipe}
+                isFavorite={favorites.includes(recipe.id)}
+                onToggleFavorite={(id) => handleToggleFavorite(id)}
+                showServingsControls={true}
+                containerStyle={styles.recipeCard}
+                titleTestID={`recipe-title-${recipe.id}`}
+                favoriteTestID={`recipe-fav-button-${recipe.id}`}
+                wrapperTestID={`recipe-wrapper-${recipe.id}`}
+                ingredientsTestID={`recipe-ingredients-${recipe.id}`}
+              />
+            );
+          })}
+        </ScrollView>
+
+        {showLoginModal ? (
+          <LoginModal setShowLoginModal={setShowLoginModal} />
         ) : null}
-
-        {filteredRecipes.length < 5 && !loading && !generating && (
-          <TouchableOpacity
-            style={[styles.generateButton]}
-            disabled={selectedIngredients.length === 0}
-            onPress={handleGenerate}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.addButtonText}>
-              Don't find what you're looking for? Generate a recipe with AI!
-            </Text>
-          </TouchableOpacity>
-        )}
-
-        {filteredRecipes.map((recipe) => {
-          const isExpanded = expandedIds.includes(recipe.id);
-          return (
-            <ExpandableRecipe
-              key={recipe.id}
-              recipe={recipe}
-              isFavorite={favorites.includes(recipe.id)}
-              onToggleFavorite={(id) => handleToggleFavorite(id)}
-              showServingsControls={true}
-              containerStyle={styles.recipeCard}
-              titleTestID={`recipe-title-${recipe.id}`}
-              favoriteTestID={`recipe-fav-button-${recipe.id}`}
-              wrapperTestID={`recipe-wrapper-${recipe.id}`}
-              ingredientsTestID={`recipe-ingredients-${recipe.id}`}
-            />
-          );
-        })}
-      </ScrollView>
-
-      {showLoginModal && <LoginModal setShowLoginModal={setShowLoginModal} />}
-    </View>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }

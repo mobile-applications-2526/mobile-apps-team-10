@@ -42,6 +42,8 @@ export const lightTheme = {
     danger: "red",
     white: "#ffffff",
     modalBackground: "rgba(0,0,0,0.3)",
+    errorBackground: "#FFFBE6",
+    errorBorder: "#FFE58F",
   },
 };
 
@@ -58,6 +60,8 @@ export const darkTheme = {
     danger: "#ff6b6b",
     white: "#ffffff",
     modalBackground: "rgba(255,255,255,0.2)",
+    errorBackground: "#a47a43ff",
+    errorBorder: "#c39959ff",
   },
 };
 

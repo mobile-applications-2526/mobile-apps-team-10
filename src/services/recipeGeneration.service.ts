@@ -47,7 +47,6 @@ export const saveGeneratedRecipe = async (recipe: GeneratedRecipe) => {
     console.log("1. Raw AI Data:", JSON.stringify(recipe, null, 2));
 
 const sanitizedIngredients = (recipe.ingredients || []).map((ing, index) => {
-  // 1️⃣ HANDLE STRINGS (Old function version or AI "hallucination")
   if (typeof ing === 'string') {
     console.log(`Log: Ingredient ${index} is a STRING. Standardizing...`);
     
@@ -69,8 +68,6 @@ const sanitizedIngredients = (recipe.ingredients || []).map((ing, index) => {
     };
   }
 
-  // 2️⃣ HANDLE OBJECTS (New function version with json_schema)
-  // TypeScript now knows 'ing' is GeneratedIngredient here
   return {
     name: (ing.name || "unknown").toLowerCase().trim(),
     quantity: Number(ing.quantity) || 1,

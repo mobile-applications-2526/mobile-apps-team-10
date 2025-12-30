@@ -115,7 +115,7 @@ export default function ExpandableRecipe({
     return rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toString();
   };
 
-  /** ✅ Price calculation per ingredient (unit-aware) */
+  /** Price calculation per ingredient (unit-aware) */
   const calculateIngredientPrice = (ri: any) => {
     const unit = ri.unit.toLowerCase();
     const multiplier = UNIT_MULTIPLIERS[unit] ?? 1;
@@ -124,7 +124,7 @@ export default function ExpandableRecipe({
     return ri.ingredients.price_per_unit * scaledQuantity * multiplier;
   };
 
-  /** ✅ Total recipe price */
+  /** Total recipe price */
   const calculateTotalPrice = () => {
     return recipe.recipe_ingredients.reduce(
       (total, ri) => total + calculateIngredientPrice(ri),
@@ -169,7 +169,6 @@ export default function ExpandableRecipe({
         </Text>
       )}
 
-      {/* ✅ Total price */}
       <Text style={[styles.time, timeStyle]}>
         💰 {formatPrice(calculateTotalPrice())}
       </Text>

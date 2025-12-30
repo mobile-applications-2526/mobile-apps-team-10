@@ -161,7 +161,7 @@ export default function FullRecipe({
           </Text>
         )}
 
-        {/* ✅ Total price */}
+        {/* Total price */}
         <Text style={[styles.time, timeStyle]}>
           💰 {formatPrice(calculateTotalPrice())}
         </Text>

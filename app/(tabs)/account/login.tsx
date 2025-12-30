@@ -41,6 +41,7 @@ export default function LoginScreen() {
 
       <TextInput
         placeholder="Email"
+        placeholderTextColor={theme.colors.placeholder}
         testID="input-email"
         value={email}
         onChangeText={setEmail}
@@ -50,6 +51,7 @@ export default function LoginScreen() {
 
       <TextInput
         placeholder="Password"
+        placeholderTextColor={theme.colors.placeholder}
         testID="input-password"
         secureTextEntry
         value={password}

@@ -1,23 +1,21 @@
 import { supabase } from "../supabase/supabase";
 
 export const generateRecipe = async (ingredients: string[]) => {
-  const res = await fetch(
-    `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/generate-recipe`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY}`,
-      },
-      body: JSON.stringify({ ingredients }),
+const res = await fetch(
+`${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/generate-recipe`,
+{
+method: "POST",
+headers: {
+"Content-Type": "application/json",
+Authorization: `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY}`,
+},
+body: JSON.stringify({ ingredients }),
     }
   );
 
   if (!res.ok) throw new Error("Recipe generation failed");
 
   const text = await res.text();
-
-  // remove any ```json ... ``` wrapper
   const cleaned = text.replace(/```json|```/g, "").trim();
 
   try {
@@ -37,7 +35,7 @@ interface GeneratedIngredient {
 type GeneratedRecipe = {
   title: string;
   steps: string[];
-  ingredients: (string | GeneratedIngredient)[]; 
+  ingredients: (string | GeneratedIngredient)[];
   cookingTimeMinutes: number;
 };
 
@@ -46,77 +44,108 @@ export const saveGeneratedRecipe = async (recipe: GeneratedRecipe) => {
     console.log("--- DEBUG START ---");
     console.log("1. Raw AI Data:", JSON.stringify(recipe, null, 2));
 
-const sanitizedIngredients = (recipe.ingredients || []).map((ing, index) => {
-  // 1️⃣ HANDLE STRINGS (Old function version or AI "hallucination")
-  if (typeof ing === 'string') {
-    console.log(`Log: Ingredient ${index} is a STRING. Standardizing...`);
-    
-    const parts = ing.trim().split(' ');
-    const quantity = parseFloat(parts[0]) || 1;
-    
-    // Improved logic: 
-    // If we have "1 cup rice", name should be "rice", unit should be "cup"
-    // If we only have "rice", name is "rice", unit is "unit"
-    const hasUnit = parts.length > 2; 
-    const unit = hasUnit ? parts[1].toLowerCase() : "unit";
-    const name = hasUnit ? parts.slice(2).join(' ') : parts.slice(1).join(' ') || ing;
+    // 1️⃣ Sanitize + normalize ingredients
+    const sanitizedIngredients = (recipe.ingredients || []).map((ing, index) => {
+      if (typeof ing === "string") {
+        const parts = ing.trim().split(" ");
+        const quantity = parseFloat(parts[0]) || 1;
+        const hasUnit = parts.length > 2;
+        const unit = hasUnit ? parts[1].toLowerCase() : "unit";
+        const name = hasUnit
+          ? parts.slice(2).join(" ")
+          : parts.slice(1).join(" ") || ing;
 
-    return {
-      name: name.toLowerCase().trim(),
-      quantity: quantity,
-      unit: unit,
-      price_estimate: 0
-    };
-  }
+        return {
+          name: name.toLowerCase().trim(),
+          quantity,
+          unit,
+          price_estimate: 0,
+        };
+      }
 
-  // 2️⃣ HANDLE OBJECTS (New function version with json_schema)
-  // TypeScript now knows 'ing' is GeneratedIngredient here
-  return {
-    name: (ing.name || "unknown").toLowerCase().trim(),
-    quantity: Number(ing.quantity) || 1,
-    unit: (ing.unit || "unit").toLowerCase().trim(),
-    price_estimate: Number(ing.price_estimate || 0)
-  };
-});
+      return {
+        name: (ing.name || "unknown").toLowerCase().trim(),
+        quantity: Number(ing.quantity) || 1,
+        unit: (ing.unit || "unit").toLowerCase().trim(),
+        price_estimate: Number(ing.price_estimate || 0),
+      };
+    });
 
     console.log("2. Sanitized Data:", sanitizedIngredients);
 
-    // 2. Insert Recipe
+    // 2️⃣ Insert Recipe
     const { data: newRecipe, error: recipeError } = await supabase
       .from("recipes")
-      .insert([{
-        title: recipe.title || "Untitled Recipe",
-        steps: recipe.steps || [],
-        time_minutes: recipe.cookingTimeMinutes || 30,
-      }])
-      .select().single();
+      .insert([
+        {
+          title: recipe.title || "Untitled Recipe",
+          steps: recipe.steps || [],
+          time_minutes: recipe.cookingTimeMinutes || 30,
+        },
+      ])
+      .select()
+      .single();
 
     if (recipeError) throw recipeError;
 
-    // 3. Upsert Ingredients
-    const { data: dbIngredients, error: ingError } = await supabase
+    // 3️⃣ Fetch existing ingredients (case-insensitive via lowercase)
+    const ingredientNames = sanitizedIngredients.map((i) => i.name);
+
+    const { data: existingIngredients, error: fetchError } = await supabase
       .from("ingredients")
-      .upsert(
-        sanitizedIngredients.map(i => ({ name: i.name, price_per_unit: i.price_estimate })),
-        { onConflict: 'name' }
-      ).select();
+      .select("id, name, price_per_unit")
+      .in("name", ingredientNames);
 
-    if (ingError) throw ingError;
+    if (fetchError) throw fetchError;
 
-    // 4. Link Join Table
-    const ingredientMap = Object.fromEntries(dbIngredients.map(i => [i.name, i.id]));
-    const joinInserts = sanitizedIngredients.map(i => ({
+    const existingMap = Object.fromEntries(
+      (existingIngredients || []).map((i) => [i.name, i])
+    );
+
+    // 4️⃣ Insert ONLY new ingredients
+    const newIngredients = sanitizedIngredients.filter(
+      (i) => !existingMap[i.name]
+    );
+
+    let insertedIngredients: any[] = [];
+
+    if (newIngredients.length > 0) {
+      const { data, error } = await supabase
+        .from("ingredients")
+        .insert(
+          newIngredients.map((i) => ({
+            name: i.name, // already lowercase
+            price_per_unit: i.price_estimate,
+          }))
+)
+.select();
+
+      if (error) throw error;
+      insertedIngredients = data ?? [];
+    }
+
+    // 5️⃣ Merge ingredient sources (DB price wins)
+    const allIngredients = [
+      ...(existingIngredients || []),
+      ...insertedIngredients,
+    ];
+
+    const ingredientMap = Object.fromEntries(
+      allIngredients.map((i) => [i.name, i.id])
+    );
+
+    // 6️⃣ Insert join table
+    const joinInserts = sanitizedIngredients.map((i) => ({
       recipe_id: newRecipe.id,
       ingredient_id: ingredientMap[i.name],
       quantity: i.quantity,
-      unit: i.unit
+      unit: i.unit,
     }));
 
     await supabase.from("recipe_ingredients").insert(joinInserts);
 
     console.log("✅ Success!");
     return newRecipe;
-
   } catch (err: any) {
     console.error("❌ CRITICAL SAVE FAILURE:", err.message);
     throw err;

@@ -44,6 +44,7 @@ export const lightTheme = {
     modalBackground: "rgba(0,0,0,0.3)",
     errorBackground: "#FFFBE6",
     errorBorder: "#FFE58F",
+    errorText: "#ba1c1cff",
   },
 };
 
@@ -62,6 +63,7 @@ export const darkTheme = {
     modalBackground: "rgba(255,255,255,0.2)",
     errorBackground: "#a47a43ff",
     errorBorder: "#c39959ff",
+    errorText: "#ffffff",
   },
 };
 

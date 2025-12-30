@@ -252,7 +252,7 @@ export default function FetchRecipes() {
           }
           contentContainerStyle={styles.container}
         >
-          {!generating || loading ? (
+          {generating || loading ? (
             <View
               style={{
                 zIndex: 999,
@@ -285,7 +285,7 @@ export default function FetchRecipes() {
               </View>
             </View>
           ) : null}
-          {!errorMsg ? (
+          {errorMsg ? (
             <View
               style={{
                 backgroundColor: theme.colors.errorBackground,
@@ -299,11 +299,19 @@ export default function FetchRecipes() {
                 alignItems: "center",
               }}
             >
-              <Text style={{ color: theme.colors.text, flex: 1 }}>
-                {errorMsg}error test
+              <Text style={{ color: theme.colors.errorText, flex: 1 }}>
+                {errorMsg}
               </Text>
               <TouchableOpacity onPress={() => setErrorMsg(null)}>
-                <Text style={{ fontWeight: "bold", marginLeft: 10 }}>✕</Text>
+                <Text
+                  style={{
+                    fontWeight: "bold",
+                    marginLeft: 10,
+                    color: theme.colors.errorText,
+                  }}
+                >
+                  ✕
+                </Text>
               </TouchableOpacity>
             </View>
           ) : null}

@@ -17,6 +17,9 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import LoginModal from "../../(modals)/LoginModal";
+import { router } from "expo-router";
+import { TouchableOpacity } from "react-native";
+
 
 export default function FavoritesScreen() {
   const { favorites, toggleFavorite, refreshFavorites } = useFavorites();
@@ -70,6 +73,29 @@ export default function FavoritesScreen() {
   return (
     <SafeAreaView style={styles.screen}>
       <Text style={styles.title}>Your Favorites</Text>
+      <TouchableOpacity
+        style={{
+          backgroundColor: theme.colors.accent,
+          paddingVertical: 12,
+          paddingHorizontal: 20,
+          borderRadius: 10,
+          alignSelf: "center",
+          marginBottom: 16,
+        }}
+        onPress={() => router.push("../recipes/addRecipe")}
+        testID="add-recipe-button"
+      >
+        <Text
+          style={{
+            color: theme.colors.white,
+            fontSize: 16,
+            fontWeight: "600",
+          }}
+        >
+          + Add a recipe manually
+        </Text>
+      </TouchableOpacity>
+
       {loading && !refreshing ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator color="tomato" />

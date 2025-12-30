@@ -354,36 +354,35 @@ export default function FetchRecipes() {
               />
             );
           })}
+
+          {visibleRecipes.map((recipe) => {
+            const isExpanded = expandedIds.includes(recipe.id);
+            return (
+              <ExpandableRecipe
+                key={recipe.id}
+                recipe={recipe}
+                isFavorite={favorites.includes(recipe.id)}
+                onToggleFavorite={(id) => handleToggleFavorite(id)}
+                showServingsControls={true}
+                containerStyle={styles.recipeCard}
+                titleTestID={`recipe-title-${recipe.id}`}
+                favoriteTestID={`recipe-fav-button-${recipe.id}`}
+                wrapperTestID={`recipe-wrapper-${recipe.id}`}
+                ingredientsTestID={`recipe-ingredients-${recipe.id}`}
+              />
+            );
+          })}
+
+          {hasMore && !loading && (
+            <TouchableOpacity
+              style={[styles.generateButton, { marginTop: 16 }]}
+              onPress={() => setPage((p) => p + 1)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.addButtonText}>Load more recipes</Text>
+            </TouchableOpacity>
+          )}
         </ScrollView>
-        {visibleRecipes.map((recipe) => {
-          const isExpanded = expandedIds.includes(recipe.id);
-          return (
-            <ExpandableRecipe
-              key={recipe.id}
-              recipe={recipe}
-              isFavorite={favorites.includes(recipe.id)}
-              onToggleFavorite={(id) => handleToggleFavorite(id)}
-              showServingsControls={true}
-              containerStyle={styles.recipeCard}
-              titleTestID={`recipe-title-${recipe.id}`}
-              favoriteTestID={`recipe-fav-button-${recipe.id}`}
-              wrapperTestID={`recipe-wrapper-${recipe.id}`}
-              ingredientsTestID={`recipe-ingredients-${recipe.id}`}
-            />
-          );
-        })}
-
-    {hasMore && !loading && (
-      <TouchableOpacity
-        style={[styles.generateButton, { marginTop: 16 }]}
-        onPress={() => setPage((p) => p + 1)}
-        activeOpacity={0.7}
-      >
-        <Text style={styles.addButtonText}>Load more recipes</Text>
-      </TouchableOpacity>
-    )}
-
-      </ScrollView>
 
         {showLoginModal ? (
           <LoginModal setShowLoginModal={setShowLoginModal} />

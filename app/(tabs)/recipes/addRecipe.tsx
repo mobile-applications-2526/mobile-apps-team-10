@@ -43,6 +43,7 @@ export default function AddRecipeScreen() {
           name: i.name,
           quantity: i.quantity || 1,
           unit: i.unit || "unit",
+          price_estimate: i.price,
         })),
     };
 

@@ -5,8 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="058aafc8-9673-4cc8-9b35-fc306c4d82ad" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/cypress/e2e/recipe-detail.cy.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cypress/e2e/signup.cy.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/recipes/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/recipes/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cypress/e2e/favorites-loggedin.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/cypress/e2e/favorites-loggedin.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cypress/e2e/login.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/cypress/e2e/login.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/FullRecipe.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/FullRecipe.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/context/FavoritesContext.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/context/FavoritesContext.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,7 +57,7 @@
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "main"
+    "git-widget-placeholder": "test"
   }
 }]]></component>
   <component name="TaskManager">

@@ -111,7 +111,10 @@ export default function ExpandableRecipe({
         <Text testID={titleTestID} style={[styles.title, titleStyle]}>
           {recipe.title}
         </Text>
-        <TouchableOpacity testID={favoriteTestID} onPress={handleToggleFavorite}>
+        <TouchableOpacity
+          testID={favoriteTestID}
+          onPress={handleToggleFavorite}
+        >
           <Ionicons
             name={isFavorite ? "heart" : "heart-outline"}
             size={24}
@@ -127,7 +130,9 @@ export default function ExpandableRecipe({
       )}
 
       {recipe.time_minutes !== null && (
-        <Text style={[styles.time, timeStyle]}>⏱ {recipe.time_minutes} min</Text>
+        <Text style={[styles.time, timeStyle]}>
+          ⏱ {recipe.time_minutes} min
+        </Text>
       )}
 
       <Text style={[styles.time, timeStyle]}>
@@ -138,14 +143,22 @@ export default function ExpandableRecipe({
         <View style={styles.expandedSection}>
           {showServingsControls && (
             <View style={styles.servingsRow}>
-              <Text style={[styles.personsLabel, subheadingStyle]}>Persons:</Text>
-              <TouchableOpacity onPress={decrease} style={styles.servingsButton}>
+              <Text style={[styles.personsLabel, subheadingStyle]}>
+                Persons:
+              </Text>
+              <TouchableOpacity
+                onPress={decrease}
+                style={styles.servingsButton}
+              >
                 <Text style={styles.servingsButtonText}>-</Text>
               </TouchableOpacity>
               <View style={styles.servingsCount}>
                 <Text style={styles.servingsButtonText}>{servings}</Text>
               </View>
-              <TouchableOpacity onPress={increase} style={[styles.servingsButton, { marginLeft: 8 }]}>
+              <TouchableOpacity
+                onPress={increase}
+                style={[styles.servingsButton, { marginLeft: 8 }]}
+              >
                 <Text style={styles.servingsButtonText}>+</Text>
               </TouchableOpacity>
             </View>
@@ -158,7 +171,8 @@ export default function ExpandableRecipe({
               return (
                 <View key={ri.ingredient_id} style={styles.ingredientRow}>
                   <Text style={[styles.ingredientText, ingredientStyle]}>
-                    {formatQuantity(scaled)} {ri.unit} {ri.ingredients.name} (€{calculateIngredientPrice(ri).toFixed(2)})
+                    {formatQuantity(scaled)} {ri.unit} {ri.ingredients.name} (€
+                    {calculateIngredientPrice(ri).toFixed(2)})
                   </Text>
                 </View>
               );
@@ -172,7 +186,11 @@ export default function ExpandableRecipe({
             </Text>
           ))}
 
-          <Link href={`/recipes/${recipe.id}`} asChild style={styles.goToRecipeButton}>
+          <Link
+            href={`/recipes/${recipe.id}`}
+            asChild
+            style={styles.goToRecipeButton}
+          >
             <Pressable>
               <Text>View Details</Text>
             </Pressable>

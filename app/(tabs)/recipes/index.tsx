@@ -39,6 +39,10 @@ export default function FetchRecipes() {
 
   const [generating, setGenerating] = useState(false);
 
+  const PAGE_SIZE = 10;
+
+  const [page, setPage] = useState(1);
+
   const theme = useTheme();
   const styles = createRecipeStyles(theme as any);
 
@@ -102,8 +106,11 @@ export default function FetchRecipes() {
     );
     result = RecipesService.filterByTime(result, maxTime);
     result = RecipesService.filterByMaxPrice(result, maxPrice);
+
     setFilteredRecipes(result);
+    setPage(1);
   }, [selectedIngredients, maxTime, maxPrice, recipes]);
+
 
   const handleToggleFavorite = async (id: number) => {
     if (!user) {
@@ -131,6 +138,8 @@ export default function FetchRecipes() {
       setGenerating(false);
     }
   };
+    const visibleRecipes = filteredRecipes.slice(0, page * PAGE_SIZE);
+    const hasMore = visibleRecipes.length < filteredRecipes.length;
 
   return (
     <View style={styles.screen}>
@@ -286,7 +295,7 @@ export default function FetchRecipes() {
           </TouchableOpacity>
         )}
 
-        {filteredRecipes.map((recipe) => {
+        {visibleRecipes.map((recipe) => {
           const isExpanded = expandedIds.includes(recipe.id);
           return (
             <ExpandableRecipe
@@ -303,6 +312,17 @@ export default function FetchRecipes() {
             />
           );
         })}
+
+    {hasMore && !loading && (
+      <TouchableOpacity
+        style={[styles.generateButton, { marginTop: 16 }]}
+        onPress={() => setPage((p) => p + 1)}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.addButtonText}>Load more recipes</Text>
+      </TouchableOpacity>
+    )}
+
       </ScrollView>
 
       {showLoginModal && <LoginModal setShowLoginModal={setShowLoginModal} />}

@@ -1,4 +1,5 @@
 import FullRecipe from "@/src/components/FullRecipe";
+import { useFavorites } from "@/src/context/FavoritesContext";
 import { useTheme } from "@/src/hooks/useTheme";
 import recipesService from "@/src/services/recipes.service";
 import { createRecipeStyles } from "@/src/styles/recipes.styles";
@@ -16,6 +17,7 @@ export default function RecipePage() {
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);
+  const { favorites, toggleFavorite, refreshFavorites } = useFavorites();
 
   useEffect(() => {
     const load = async () => {
@@ -46,5 +48,11 @@ export default function RecipePage() {
     );
   }
 
-  return <FullRecipe recipe={recipe} />;
+  return (
+    <FullRecipe
+      recipe={recipe}
+      isFavorite={favorites.includes(recipe.id)}
+      onToggleFavorite={toggleFavorite}
+    />
+  );
 }

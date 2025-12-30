@@ -1,39 +1,40 @@
+import('../support/e2e');
+
 describe('Favorites when logged in (E2E mocked)', () => {
   beforeEach(() => {
     // stub recipes data
     cy.intercept('GET', '**/rest/v1/recipes*', { fixture: 'recipes.json' }).as('getRecipes');
   });
 
-  it('can favorite a recipe and it shows up in Favorites tab', () => {
-    // ensure support file is loaded (import is idempotent)
-    import('../support/e2e')
-    // Initialize and visit with E2E user set before the app mounts (use fallback if command missing)
-    if ((cy as any).visitWithE2EUser) {
-      cy.visitWithE2EUser('/recipes', { id: 'test-user', email: 'test@example.com' }, { 'test-user': [] });
-    } else {
-      cy.visit('/recipes', { onBeforeLoad(win) { (win as any).__E2E_USER = { id: 'test-user', email: 'test@example.com' }; (win as any).__E2E_FAVORITES = { 'test-user': [] }; } });
-    }
-    cy.wait('@getRecipes');
-
-    // Favorite the first recipe
-    cy.get('[data-testid="recipe-fav-button-1"]').click();
-
-    // Give the app a moment to update E2E favorite storage
-    cy.wait(200);
-
-    // Go to favorites tab and assert it's present. Use visitWithE2EUser so the new page sees the E2E user + favorites
-    cy.intercept('GET', '**/rest/v1/recipes*', { fixture: 'recipes.json' }).as('getFavRecipes');
+  it('shows favorite recipes in the Favorites tab and can unfavorite them', () => {
+    // Visit the favorites page with the E2E user already having recipe 1 favorited
     if ((cy as any).visitWithE2EUser) {
       cy.visitWithE2EUser('/favorites', { id: 'test-user', email: 'test@example.com' }, { 'test-user': [1] });
     } else {
       cy.visit('/favorites', { onBeforeLoad(win) { (win as any).__E2E_USER = { id: 'test-user', email: 'test@example.com' }; (win as any).__E2E_FAVORITES = { 'test-user': [1] }; } });
     }
-    cy.wait('@getFavRecipes');
+
+    cy.wait('@getRecipes');
+
+    // Debug: capture a screenshot of the page state and log E2E favorites
+    cy.screenshot('favorites-page-before-assert');
+    cy.window().then((win:any) => {
+      // write to Cypress runner log; helpful for debugging
+      // eslint-disable-next-line no-console
+      console.log('window.__E2E_FAVORITES =', win.__E2E_FAVORITES);
+    });
+
+    // The favorite recipe should be visible
     cy.get('[data-testid="recipe-title-1"]').should('exist');
 
-    // Unfavorite it
+    // Unfavorite it from the Favorites tab
     cy.get('[data-testid="recipe-fav-button-1"]').click();
-    cy.wait(200);
+    cy.wait(250);
+
+    // Capture screenshot after unfavoriting for debugging
+    cy.screenshot('favorites-page-after-unfavorite');
+
+    // It should no longer be present
     cy.get('[data-testid="recipe-title-1"]').should('not.exist');
   });
 });

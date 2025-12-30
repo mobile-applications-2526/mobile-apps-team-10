@@ -59,8 +59,15 @@ export default function FullRecipe({
 
   useEffect(() => {
     const load = async () => {
-      const { data } = await SessionService.getSession();
-      // E2E fallback
+      // Safely attempt to read session; if supabase fails (e.g. in E2E), fall back to window __E2E_USER
+      let data: any = { session: null };
+      try {
+        const res = await SessionService.getSession();
+        data = res?.data ?? { session: null };
+      } catch (err) {
+        data = { session: null };
+      }
+
       try {
         // @ts-ignore
         const win = typeof window !== "undefined" ? (window as any) : undefined;

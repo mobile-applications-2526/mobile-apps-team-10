@@ -16,4 +16,27 @@ describe('Login flow (E2E shortcut)', () => {
     cy.url().should('include', '/account');
     cy.get('[data-testid="account-title"]').should('exist');
   });
+
+  it('shows error when logging in with invalid credentials', () => {
+      const loginUrl = '/(tabs)/account/login';
+
+      import('../support/e2e');
+      if ((cy as any).visitWithE2EUser) {
+          cy.visitWithE2EUser(loginUrl, { id: 'test-user', email: 'test@example.com' }, { 'test-user': [] });
+      } else {
+          cy.visit(loginUrl, {
+              onBeforeLoad(win) {
+                  (win as any).__E2E_USER = { id: 'test-user', email: 'test@example.com' };
+                  (win as any).__E2E_FAVORITES = { 'test-user': [] };
+              }
+          });
+      }
+
+      cy.get('[data-testid="input-email"]').type('wrong-user@example.com');
+      cy.get('[data-testid="input-password"]').type('wrongpassword');
+      cy.get('[data-testid="btn-login"]').click();
+
+      cy.contains(/invalid login credentials/i, { timeout: 7000 })
+        .should('be.visible');
+  });
 });

@@ -253,9 +253,7 @@ export default function FetchRecipes() {
               >
                 {ing}
               </Text>
-              <TouchableOpacity>
-                <Text style={styles.remove}>X</Text>
-              </TouchableOpacity>
+              <Text style={styles.remove}>X</Text>
             </TouchableOpacity>
           ))}
         </View>

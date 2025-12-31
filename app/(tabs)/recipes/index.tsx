@@ -339,24 +339,6 @@ export default function FetchRecipes() {
             </TouchableOpacity>
           ) : null}
 
-          {filteredRecipes.map((recipe) => {
-            const isExpanded = expandedIds.includes(recipe.id);
-            return (
-              <ExpandableRecipe
-                key={recipe.id}
-                recipe={recipe}
-                isFavorite={favorites.includes(recipe.id)}
-                onToggleFavorite={(id) => handleToggleFavorite(id)}
-                showServingsControls={true}
-                containerStyle={styles.recipeCard}
-                titleTestID={`recipe-title-${recipe.id}`}
-                favoriteTestID={`recipe-fav-button-${recipe.id}`}
-                wrapperTestID={`recipe-wrapper-${recipe.id}`}
-                ingredientsTestID={`recipe-ingredients-${recipe.id}`}
-              />
-            );
-          })}
-
           {visibleRecipes.map((recipe) => {
             const isExpanded = expandedIds.includes(recipe.id);
             return (

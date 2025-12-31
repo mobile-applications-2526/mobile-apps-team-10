@@ -80,6 +80,7 @@ export default function AddRecipeScreen() {
           placeholderTextColor={theme.colors.placeholder}
           value={title}
           onChangeText={setTitle}
+          testID="input-title"
           style={{
             borderWidth: 1,
             borderColor: theme.colors.border,

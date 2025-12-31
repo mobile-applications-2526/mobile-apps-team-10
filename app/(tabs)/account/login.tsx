@@ -1,4 +1,3 @@
-import ThemeSwitcher from "@/src/components/ThemeSwitcher";
 import { useTheme } from "@/src/hooks/useTheme";
 import AuthService from "@/src/services/auth.service";
 import { createAccountStyles } from "@/src/styles/account.styles";
@@ -88,7 +87,6 @@ export default function LoginScreen() {
           <Text style={styles.linkText}>Don't have an account? Create one</Text>
         </TouchableOpacity>
       </View>
-      <ThemeSwitcher />
     </View>
   );
 }

@@ -6,7 +6,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function ThemeSwitcher() {
   const { themeMode, setThemeMode } = useThemeContext();
-  const theme = useTheme(); // Uses your existing theme styling
+  const theme = useTheme();
 
   const options = [
     { id: "light", label: "Light", icon: "white-balance-sunny" },
@@ -15,7 +15,12 @@ export default function ThemeSwitcher() {
   ] as const;
 
   return (
-    <View style={[styles.container, { marginBottom: 24 }]}>
+    <View
+      style={[
+        styles.container,
+        { marginBottom: 24, marginHorizontal: theme.spacing.md },
+      ]}
+    >
       <Text style={[styles.label, { color: theme.colors.text }]}>
         Appearance
       </Text>

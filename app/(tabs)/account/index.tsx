@@ -23,7 +23,7 @@ export default function AccountIndex() {
       if (!mounted) return;
       try {
         // @ts-ignore
-        const win = typeof window !== 'undefined' ? (window as any) : undefined;
+        const win = typeof window !== "undefined" ? (window as any) : undefined;
         const e2eUser = win && win.__E2E_USER ? win.__E2E_USER : null;
         setUser(data.session?.user ?? e2eUser ?? null);
       } catch (e) {
@@ -38,14 +38,15 @@ export default function AccountIndex() {
       (_event, session) => {
         if (!mounted) return;
         try {
-        // @ts-ignore
-        const win = typeof window !== 'undefined' ? (window as any) : undefined;
-        const e2eUser = win && win.__E2E_USER ? win.__E2E_USER : null;
-        setUser(session?.user ?? e2eUser ?? null);
-      } catch (e) {
-        setUser(session?.user ?? null);
+          // @ts-ignore
+          const win =
+            typeof window !== "undefined" ? (window as any) : undefined;
+          const e2eUser = win && win.__E2E_USER ? win.__E2E_USER : null;
+          setUser(session?.user ?? e2eUser ?? null);
+        } catch (e) {
+          setUser(session?.user ?? null);
         }
-    }
+      }
     );
 
     return () => {
@@ -57,7 +58,9 @@ export default function AccountIndex() {
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text testID="account-title" style={styles.title}>Account</Text>
+        <Text testID="account-title" style={styles.title}>
+          Account
+        </Text>
         <Text>Loading…</Text>
       </View>
     );
@@ -69,7 +72,9 @@ export default function AccountIndex() {
 
   return (
     <View style={styles.container}>
-      <Text testID="account-title" style={styles.title}>Account</Text>
+      <Text testID="account-title" style={styles.title}>
+        Account
+      </Text>
       <Text style={{ marginBottom: 12 }}>{user.email}</Text>
       <TouchableOpacity
         onPress={async () => {

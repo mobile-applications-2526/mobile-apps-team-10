@@ -1,4 +1,5 @@
 import ExpandableRecipe from "@/src/components/ExpandableRecipe";
+import KeyboardDismissWrapper from "@/src/components/KeyboardDismissWrapper";
 import { useFavorites } from "@/src/context/FavoritesContext";
 import { useTheme } from "@/src/hooks/useTheme";
 import {
@@ -14,13 +15,11 @@ import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Keyboard,
   RefreshControl,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import LoginModal from "../../(modals)/LoginModal";
@@ -160,7 +159,7 @@ export default function FetchRecipes() {
   const hasMore = visibleRecipes.length < filteredRecipes.length;
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+    <KeyboardDismissWrapper>
       <View style={styles.screen}>
         <View style={styles.header}>
           <Text style={styles.pageTitle}>Recipes</Text>
@@ -237,7 +236,7 @@ export default function FetchRecipes() {
             </View>
           </>
         ) : null}
-        <View style={styles.selectedList}>
+        <View style={styles.selectedList} testID="selected-ingredients">
           {selectedIngredients.map((ing) => (
             <TouchableOpacity
               key={ing}
@@ -248,7 +247,12 @@ export default function FetchRecipes() {
                 )
               }
             >
-              <Text style={{ color: theme.colors.text }}>{ing}</Text>
+              <Text
+                style={{ color: theme.colors.text }}
+                testID={`selected-ingredient-${ing}`}
+              >
+                {ing}
+              </Text>
               <TouchableOpacity>
                 <Text style={styles.remove}>X</Text>
               </TouchableOpacity>
@@ -265,7 +269,6 @@ export default function FetchRecipes() {
           {generating || loading ? (
             <View
               style={{
-                zIndex: 999,
                 justifyContent: "center",
                 alignItems: "center",
               }}
@@ -332,6 +335,7 @@ export default function FetchRecipes() {
               disabled={selectedIngredients.length === 0}
               onPress={handleGenerate}
               activeOpacity={0.7}
+              testID="generate-ai-button"
             >
               <Text style={styles.addButtonText}>
                 Don't find what you're looking for? Generate a recipe with AI!
@@ -372,6 +376,6 @@ export default function FetchRecipes() {
           <LoginModal setShowLoginModal={setShowLoginModal} />
         ) : null}
       </View>
-    </TouchableWithoutFeedback>
+    </KeyboardDismissWrapper>
   );
 }

@@ -54,9 +54,7 @@ describe('Recipes tab additional behaviours', () => {
     cy.get('[data-testid="filter-add"]').click();
     cy.get('[data-testid="selected-ingredients"]').contains('tomato').should('exist');
 
-    cy.get('[data-testid="selected-ingredients"]').contains('tomato').parent().within(() => {
-      cy.contains('X').click();
-    });
+    cy.get('[data-testid="selected-ingredient-tomato"]').should('exist').click();
 
     cy.get('[data-testid="selected-ingredients"]').contains('tomato').should('not.exist');
   });

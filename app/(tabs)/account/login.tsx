@@ -2,10 +2,18 @@ import { useTheme } from "@/src/hooks/useTheme";
 import AuthService from "@/src/services/auth.service";
 import { createAccountStyles } from "@/src/styles/account.styles";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import * as SecureStore from "expo-secure-store";
+import React, { useEffect, useState } from "react";
+import {
+  Platform,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function LoginScreen() {
+  const passwordRef = React.useRef<TextInput>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [result, setResult] = useState<string | null>(null);
@@ -13,6 +21,26 @@ export default function LoginScreen() {
 
   const theme = useTheme();
   const styles = createAccountStyles(theme as any);
+
+  // Load credentials from Keychain on mount
+  useEffect(() => {
+    async function loadSavedCredentials() {
+      // ONLY run this on iOS or Android
+      if (Platform.OS === "web") return;
+
+      try {
+        const savedEmail = await SecureStore.getItemAsync("user_email");
+        const savedPassword = await SecureStore.getItemAsync("user_password");
+        if (savedEmail && savedPassword) {
+          setEmail(savedEmail);
+          setPassword(savedPassword);
+        }
+      } catch (e) {
+        console.log("SecureStore not available", e);
+      }
+    }
+    loadSavedCredentials();
+  }, []);
 
   const signIn = async () => {
     // E2E helper: when running Cypress with ?e2e_login_success=1 we skip real auth
@@ -23,7 +51,6 @@ export default function LoginScreen() {
       ) {
         setResult("Login successful");
         router.replace("/account");
-        return;
       }
     } catch (e) {
       // ignore in non-browser environments
@@ -33,6 +60,14 @@ export default function LoginScreen() {
     if (res.error) {
       setResult(res.error.message ?? String(res.error));
     } else {
+      if (Platform.OS !== "web") {
+        try {
+          await SecureStore.setItemAsync("user_email", email);
+          await SecureStore.setItemAsync("user_password", password);
+        } catch (e) {
+          console.log("Failed to save credentials", e);
+        }
+      }
       setResult("Login successful");
       router.replace("/account");
     }
@@ -53,9 +88,16 @@ export default function LoginScreen() {
           onChangeText={setEmail}
           autoCapitalize="none"
           style={styles.input}
+          returnKeyType="next"
+          onSubmitEditing={() => passwordRef.current?.focus()}
+          blurOnSubmit={false}
+          // iOS and Android autofill
+          textContentType="username"
+          autoComplete="email"
         />
 
         <TextInput
+          ref={passwordRef}
           placeholder="Password"
           placeholderTextColor={theme.colors.placeholder}
           testID="input-password"
@@ -63,8 +105,12 @@ export default function LoginScreen() {
           value={password}
           onChangeText={setPassword}
           style={styles.input}
+          returnKeyType="done"
+          onSubmitEditing={signIn}
+          // iOS and Android autofill
+          textContentType="password"
+          autoComplete="password"
         />
-
         <TouchableOpacity
           onPress={signIn}
           style={styles.button}

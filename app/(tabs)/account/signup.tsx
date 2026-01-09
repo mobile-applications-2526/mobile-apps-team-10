@@ -2,10 +2,11 @@ import { useTheme } from "@/src/hooks/useTheme";
 import SignupService from "@/src/services/signup.service";
 import { createAccountStyles } from "@/src/styles/account.styles";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function SignUpScreen() {
+  const passwordRef = React.useRef<TextInput>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [result, setResult] = useState<string | null>(null);
@@ -29,18 +30,32 @@ export default function SignUpScreen() {
 
       <TextInput
         placeholder="Email"
+        placeholderTextColor={theme.colors.placeholder}
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
         style={styles.input}
+        // iOS and Android autofill
+        textContentType="username"
+        autoComplete="email"
+        keyboardType="email-address"
+        returnKeyType="next"
+        onSubmitEditing={() => passwordRef.current?.focus()}
       />
 
       <TextInput
+        ref={passwordRef}
         placeholder="Password"
+        placeholderTextColor={theme.colors.placeholder}
         secureTextEntry
         value={password}
         onChangeText={setPassword}
         style={styles.input}
+        // NATIVE KEYCHAIN HINTS:
+        textContentType="newPassword"
+        autoComplete="password-new"
+        onSubmitEditing={signUp}
+        returnKeyType="done"
       />
 
       <TouchableOpacity
@@ -54,10 +69,10 @@ export default function SignUpScreen() {
       {result && <Text style={styles.result}>{result}</Text>}
       <TouchableOpacity
         onPress={() => router.push("/(tabs)/account/login")}
-        style={{ marginTop: 12 }}
+        style={styles.linkSpacing}
         activeOpacity={0.7}
       >
-        <Text style={{ color: "blue" }}>Already have an account? Log in</Text>
+        <Text style={styles.linkText}>Already have an account? Log in</Text>
       </TouchableOpacity>
     </View>
   );

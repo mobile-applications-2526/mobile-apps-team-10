@@ -100,6 +100,13 @@ function LayoutContent({ user }: { user: User | null | undefined }) {
         }}
       />
       <Tabs.Screen name="(modals)/LoginModal" options={{ href: null }} />
+      {/* HIDE THE CALLBACK PAGE */}
+      <Tabs.Screen
+        name="auth/callback"
+        options={{
+          href: null, // This prevents it from appearing in the bar
+        }}
+      />
     </Tabs>
   );
 }

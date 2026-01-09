@@ -327,7 +327,7 @@ export default function FetchRecipes() {
             </View>
           ) : null}
 
-          {filteredRecipes.length < 5 && !loading && !generating ? (
+          {filteredRecipes.length < 5 && user && !loading && !generating ? (
             <TouchableOpacity
               style={[styles.generateButton]}
               disabled={selectedIngredients.length === 0}
@@ -340,6 +340,18 @@ export default function FetchRecipes() {
               </Text>
             </TouchableOpacity>
           ) : null}
+
+          {!user && filteredRecipes.length < 5 && !loading && !generating && (
+            <TouchableOpacity
+              style={[styles.generateButton]}
+              onPress={() => router.push("/(tabs)/account/login")}
+            >
+              <Text style={styles.addButtonText}>
+                Want to try generating a new recipe with AI? Log in to access
+                this feature!
+              </Text>
+            </TouchableOpacity>
+          )}
 
           {visibleRecipes.map((recipe) => {
             const isExpanded = expandedIds.includes(recipe.id);
